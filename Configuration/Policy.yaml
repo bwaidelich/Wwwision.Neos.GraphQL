@@ -1,0 +1,14 @@
+privilegeTargets:
+
+  'TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+
+    'Wwwision.Neos.GraphQl:Endpoint':
+      matcher: 'method(Wwwision\Neos\GraphQl\Controller\StandardController->(index|query)Action())'
+
+roles:
+
+  'TYPO3.Flow:Everybody':
+    privileges:
+      -
+        privilegeTarget: 'Wwwision.Neos.GraphQl:Endpoint'
+        permission: GRANT

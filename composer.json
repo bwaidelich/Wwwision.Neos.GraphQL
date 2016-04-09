@@ -1,0 +1,19 @@
+{
+    "description": "GraphQL API for the Neos Content Repository",
+    "type": "neos-package",
+    "name": "wwwision/neos-graphql",
+    "require": {
+        "typo3/neos": "~2.1",
+        "webonyx/graphql-php": "~0.5"
+    },
+    "autoload": {
+        "psr-4": {
+            "Wwwision\\Neos\\GraphQl\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "Wwwision.Neos.GraphQl"
+        }
+    }
+}

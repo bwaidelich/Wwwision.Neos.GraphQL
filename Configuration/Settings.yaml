@@ -1,0 +1,15 @@
+TYPO3:
+  Flow:
+    security:
+      authentication:
+        providers:
+          Typo3BackendProvider:
+            label: 'Neos Backend'
+            provider: 'PersistedUsernamePasswordProvider'
+            requestPatterns:
+              controllerObjectName: 'TYPO3\Neos\Controller\.*|TYPO3\Neos\Service\.*|TYPO3\Media\Controller\.*|Wwwision\Neos\GraphQl\.*'
+
+    mvc:
+      routes:
+        'Wwwision.Neos.GraphQl':
+          position: 'start'
