@@ -64,8 +64,7 @@ class Node extends ObjectType
                         $nodeTypeFilter = isset($args['nodeTypeFilter']) ? $args['nodeTypeFilter'] : null;
                         $limit = isset($args['limit']) ? $args['limit'] : null;
                         $offset = isset($args['offset']) ? $args['offset'] : null;
-                        $recursive = isset($args['recursive']) ? $args['recursive'] : null;
-                        return new IterableAccessibleObject($node->getChildNodes($nodeTypeFilter, $limit, $offset, $recursive));
+                        return new IterableAccessibleObject($node->getChildNodes($nodeTypeFilter, $limit, $offset));
                     }
                 ],
                 'nodeAllowedAsChildNode' => [

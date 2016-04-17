@@ -36,8 +36,8 @@ class RootQuery extends ObjectType
                         'invisibleContentShown' => ['type' => Type::boolean()],
                         'removedContentShown' => ['type' => Type::boolean()],
                         'inaccessibleContentShown' => ['type' => Type::boolean()],
-                        'currentSite' => ['type' => Type::string()],
-                        'currentDomain' => ['type' => Type::string()],
+                        'currentSite' => ['type' => $typeResolver->get(Site::class)],
+                        'currentDomain' => ['type' => $typeResolver->get(Domain::class)],
                     ],
                     'resolve' => function ($_, $contextConfiguration) {
                         $context = $this->contextFactory->create($contextConfiguration);

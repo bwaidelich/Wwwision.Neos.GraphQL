@@ -5,22 +5,30 @@ use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\Neos\Domain\Model\Domain as NeosDomain;
+use TYPO3\Neos\Domain\Repository\DomainRepository;
 
 /**
- * Scalar type wrapper for \DateTimeInterface values
+ * Scalar type wrapper for \TYPO3\Neos\Domain\Model\Domain values
  */
-class DateTime extends ScalarType
+class Domain extends ScalarType
 {
 
     /**
-     * @var string
+     * @Flow\Inject
+     * @var DomainRepository
      */
-    public $name = 'DateTime';
+    protected $domainRepository;
 
     /**
      * @var string
      */
-    public $description = 'A Date and time, represented as ISO 8601 conform string';
+    public $name = 'Domain';
+
+    /**
+     * @var string
+     */
+    public $description = 'A domain, represented by its host name';
 
     /**
      * Note: The public constructor is needed because the parent constructor is protected, any other way?
@@ -31,36 +39,32 @@ class DateTime extends ScalarType
     }
 
     /**
-     * @param \DateTimeInterface $value
+     * @param NeosDomain $value
      * @return string
      */
     public function serialize($value)
     {
-        if (!$value instanceof \DateTimeInterface) {
+        if (!$value instanceof NeosDomain) {
             return null;
         }
-        return $value->format(DATE_ISO8601);
+        return $value->getHostPattern();
     }
 
     /**
      * @param string $value
-     * @return \DateTimeImmutable
+     * @return NeosDomain
      */
     public function parseValue($value)
     {
         if (!is_string($value)) {
             return null;
         }
-        $dateTime = \DateTimeImmutable::createFromFormat(DATE_ISO8601, $value);
-        if ($dateTime === false) {
-            return null;
-        }
-        return $dateTime;
+        return $this->domainRepository->findOneByHost($value, true);
     }
 
     /**
      * @param AstNode $valueAST
-     * @return \DateTimeImmutable
+     * @return NeosDomain
      */
     public function parseLiteral($valueAST)
     {
