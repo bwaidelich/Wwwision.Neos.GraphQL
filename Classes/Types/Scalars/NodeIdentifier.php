@@ -1,10 +1,14 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types;
+namespace Wwwision\Neos\GraphQl\Types\Scalars;
 
+use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
 use TYPO3\Flow\Annotations as Flow;
 
+/**
+ * Scalar type representing node identifiers (UUID)
+ */
 class NodeIdentifier extends ScalarType
 {
     /**
@@ -12,7 +16,15 @@ class NodeIdentifier extends ScalarType
      */
     const PATTERN_MATCH_UUID = '/^([a-f0-9]){8}-([a-f0-9]){4}-([a-f0-9]){4}-([a-f0-9]){4}-([a-f0-9]){12}$/';
 
-    public $name = 'NodeIdentifier';
+    /**
+     * @var string
+     */
+    public $name = 'NodeIdentifierScalar';
+
+    /**
+     * @var string
+     */
+    public $description = 'A node identifier represented as UUID string';
 
     /**
      * Note: The public constructor is needed because the parent constructor is protected, any other way?
@@ -22,16 +34,28 @@ class NodeIdentifier extends ScalarType
         parent::__construct();
     }
 
+    /**
+     * @param string $value
+     * @return string
+     */
     public function serialize($value)
     {
         return self::isNodeIdentifier($value) ? $value : null;
     }
 
+    /**
+     * @param string $value
+     * @return string
+     */
     public function parseValue($value)
     {
         return self::isNodeIdentifier($value) ? $value : null;
     }
 
+    /**
+     * @param AstNode $valueAST
+     * @return string
+     */
     public function parseLiteral($valueAST)
     {
         if (!$valueAST instanceof StringValue) {
@@ -40,12 +64,13 @@ class NodeIdentifier extends ScalarType
         return $this->parseValue($valueAST->value);
     }
 
+    /**
+     * @param string $value
+     * @return boolean
+     */
     static public function isNodeIdentifier($value)
     {
-        if (!is_string($value) || preg_match(self::PATTERN_MATCH_UUID, $value) !== 1) {
-            return null;
-        }
-        return $value;
+        return (is_string($value) && preg_match(self::PATTERN_MATCH_UUID, $value) !== 1);
     }
 
 }

@@ -1,34 +1,26 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types;
+namespace Wwwision\Neos\GraphQl\Types\Scalars;
 
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
 use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Neos\Domain\Model\Site as NeosSite;
-use TYPO3\Neos\Domain\Repository\SiteRepository;
 
 /**
- * Scalar type wrapper for \TYPO3\Neos\Domain\Model\Site values
+ * Scalar type wrapper for \DateTimeInterface values
  */
-class Site extends ScalarType
+class DateTime extends ScalarType
 {
 
     /**
-     * @Flow\Inject
-     * @var SiteRepository
+     * @var string
      */
-    protected $siteRepository;
+    public $name = 'DateTimeScalar';
 
     /**
      * @var string
      */
-    public $name = 'Site';
-
-    /**
-     * @var string
-     */
-    public $description = 'A site, represented by its node name';
+    public $description = 'A Date and time, represented as ISO 8601 conform string';
 
     /**
      * Note: The public constructor is needed because the parent constructor is protected, any other way?
@@ -39,33 +31,36 @@ class Site extends ScalarType
     }
 
     /**
-     * @param NeosSite $value
+     * @param \DateTimeInterface $value
      * @return string
      */
     public function serialize($value)
     {
-        if (!$value instanceof NeosSite) {
+        if (!$value instanceof \DateTimeInterface) {
             return null;
         }
-        return $value->getNodeName();
+        return $value->format(DATE_ISO8601);
     }
 
     /**
      * @param string $value
-     * @return NeosSite
+     * @return \DateTimeImmutable
      */
     public function parseValue($value)
     {
         if (!is_string($value)) {
             return null;
         }
-        /** @noinspection PhpUndefinedMethodInspection */
-        return $this->siteRepository->findOneByNodeName($value);
+        $dateTime = \DateTimeImmutable::createFromFormat(DATE_ISO8601, $value);
+        if ($dateTime === false) {
+            return null;
+        }
+        return $dateTime;
     }
 
     /**
      * @param AstNode $valueAST
-     * @return NeosSite
+     * @return \DateTimeImmutable
      */
     public function parseLiteral($valueAST)
     {

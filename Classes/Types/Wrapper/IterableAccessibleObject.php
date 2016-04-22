@@ -2,10 +2,10 @@
 namespace Wwwision\Neos\GraphQl\Types\Wrapper;
 
 use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Flow\Reflection\ObjectAccess;
 
 /**
- * A wrapper for collections of arbitrary objects to expose all getters
+ * A wrapper for collections of arbitrary objects to recursively expose all getters
+ * @see AccessibleObject
  *
  * @Flow\Proxy(false)
  */
@@ -13,7 +13,7 @@ class IterableAccessibleObject implements \Iterator
 {
 
     /**
-     * @var mixed
+     * @var \Iterator
      */
     protected $innerIterator;
 
@@ -29,14 +29,6 @@ class IterableAccessibleObject implements \Iterator
         } else {
             throw new \InvalidArgumentException('The IterableAccessibleObject only works on arrays or objects implementing the Iterator interface', 1460895979);
         }
-    }
-
-    /**
-     * @return \Iterator
-     */
-    public function getIterator()
-    {
-        return $this->innerIterator;
     }
 
     /**

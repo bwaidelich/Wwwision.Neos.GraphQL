@@ -1,14 +1,16 @@
 -
-  name: 'graphql endpoint'
+  name: 'graphql - GraphiQL UI'
   uriPattern: 'neos/graphql'
   defaults:
     '@package':    'Wwwision.Neos.GraphQl'
     '@controller': 'Standard'
     '@action':     'index'
+    '@format':     'html'
+  appendExceedingArguments: true
   httpMethods: [GET]
 
 -
-  name: 'graphql query'
+  name: 'graphql - endpoint'
   uriPattern: 'neos/graphql'
   defaults:
     '@package':    'Wwwision.Neos.GraphQl'

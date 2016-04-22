@@ -7,9 +7,14 @@ use TYPO3\Flow\Annotations as Flow;
 use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
 use TYPO3\TYPO3CR\Domain\Service\NodeTypeManager;
 use Wwwision\Neos\GraphQl\TypeResolver;
+use Wwwision\Neos\GraphQl\Types\Scalars\AbsoluteNodePath;
+use Wwwision\Neos\GraphQl\Types\Scalars\NodeIdentifier;
 use Wwwision\Neos\GraphQl\Types\Wrapper\AccessibleObject;
 use Wwwision\Neos\GraphQl\Types\Wrapper\IterableAccessibleObject;
 
+/**
+ * A GraphQL type definition describing a TYPO3\TYPO3CR\Domain\Model\NodeInterface
+ */
 class Node extends ObjectType
 {
 
@@ -26,37 +31,50 @@ class Node extends ObjectType
     {
         return parent::__construct([
             'name' => 'Node',
+            'description' => 'A Node of the Content Repository',
             'fields' => [
-                'name' => ['type' => Type::string()],
-                'label' => ['type' => Type::string()],
-                'propertyNames' => ['type' => Type::listOf(Type::string())],
-                'properties' => ['type' => $typeResolver->get(NodeProperties::class)],
-                'hidden' => ['type' => Type::boolean()],
-                'hiddenBeforeDateTime' => ['type' => $typeResolver->get(DateTime::class)],
-                'hiddenAfterDateTime' => ['type' => $typeResolver->get(DateTime::class)],
-                'hiddenInIndex' => ['type' => Type::boolean()],
-                'removed' => ['type' => Type::boolean()],
-                'visible' => ['type' => Type::boolean()],
-                'accessible' => ['type' => Type::boolean()],
-                'accessRestrictions' => ['type' => Type::boolean()],
-                'accessRoles' => ['type' => Type::listOf(Type::string())],
-                'autoCreated' => ['type' => Type::boolean()],
-                'path' => ['type' => Type::string()],
-                'contextPath' => ['type' => Type::string()],
-                'depth' => ['type' => Type::int()],
-                'workspace' => ['type' => $typeResolver->get(Workspace::class)],
-                'identifier' => ['type' => Type::string()],
-                'index' => ['type' => Type::int()],
-                'parent' => ['type' => function() use ($typeResolver) {return $typeResolver->get(Node::class);}],
-                'parentPath' => ['type' => Type::string()],
-                'primaryChildNode' => ['type' => function() use ($typeResolver) {return $typeResolver->get(Node::class);}],
+                'name' => ['type' => Type::string(), 'description' => 'Name of this node'],
+                'label' => ['type' => Type::string(), 'description' => 'Full length plain text label of this node'],
+                'hasProperty' => [
+                    'type' => Type::boolean(),
+                    'description' => 'If this node has a property with the given name',
+                    'args' => [
+                        'propertyName' => ['type' => Type::nonNull(Type::string())],
+                    ],
+                    'resolve' => function (AccessibleObject $wrappedNode, array $args) {
+                        /** @var NodeInterface $node */
+                        $node = $wrappedNode->getObject();
+                        return $node->hasProperty($args['propertyName']);
+                    }
+                ],
+                'propertyNames' => ['type' => Type::listOf(Type::string()), 'description' => 'The names of all properties of this node'],
+                'properties' => ['type' => $typeResolver->get(Scalars\UnstructuredObjectScalar::class), 'description' => 'All properties of this node'],
+                'isHidden' => ['type' => Type::boolean(), 'description' => 'Whether this node is marked hidden'],
+                'hiddenBeforeDateTime' => ['type' => $typeResolver->get(Scalars\DateTime::class), 'description' => 'The date and time before which this node will be automatically hidden'],
+                'hiddenAfterDateTime' => ['type' => $typeResolver->get(Scalars\DateTime::class), 'description' => 'The node and time after which this node will be hidden'],
+                'isHiddenInIndex' => ['type' => Type::boolean(), 'description' => 'Whether this node should be hidden in indexes'],
+                'isRemoved' => ['type' => Type::boolean(), 'description' => 'Whether this node has been removed'],
+                'isVisible' => ['type' => Type::boolean(), 'description' => 'Whether this node is visible (depending on hidden flag, hiddenBeforeDateTime and hiddenAfterDateTime)'],
+                'isAccessible' => ['type' => Type::boolean(), 'description' => 'Whether this node may be accessed according to the current security context'],
+                'hasAccessRestrictions' => ['type' => Type::boolean(), 'description' => 'Whether this node as access restrictions applied'],
+                'accessRoles' => ['type' => Type::listOf(Type::string()), 'description' => 'The names of defined access roles'],
+                'isAutoCreated' => ['type' => Type::boolean(), 'description' => 'Whether this node is configured as auto-created childNode of its parent'],
+                'path' => ['type' => $typeResolver->get(AbsoluteNodePath::class), 'description' => 'The absolute path of tis node'],
+                'contextPath' => ['type' => Type::string(), 'description' => 'The absolute path of this node including context information'],
+                'depth' => ['type' => Type::int(), 'description' => 'The level at which this node is located in the tree'],
+                'workspace' => ['type' => $typeResolver->get(Workspace::class), 'description' => 'The workspace this node is contained in'],
+                'identifier' => ['type' => $typeResolver->get(NodeIdentifier::class), 'description' => 'The identifier of this node (not the technical id)'],
+                'index' => ['type' => Type::int(), 'deprecationReason' => 'Not part of the public API', 'description' => 'The index of this node among its siblings'],
+                'parent' => ['type' => $typeResolver->get(Node::class), 'description' => 'The parent node of this node'],
+                'parentPath' => ['type' => $typeResolver->get(AbsoluteNodePath::class), 'description' => 'The parent node path'],
+                'primaryChildNode' => ['type' => $typeResolver->get(Node::class), 'description' => 'The primary child node of this node, if it exists'],
                 'childNodes' => [
                     'type' => Type::listOf($typeResolver->get(Node::class)),
+                    'description' => 'All direct child nodes of this node, optionally filtered by type',
                     'args' => [
                         'nodeTypeFilter' => ['type' => Type::string()],
                         'limit' => ['type' => Type::int()],
                         'offset' => ['type' => Type::int()],
-                        'recursive' => ['type' => Type::boolean()]
                     ],
                     'resolve' => function (AccessibleObject $wrappedNode, array $args) {
                         /** @var NodeInterface $node */
@@ -67,8 +85,10 @@ class Node extends ObjectType
                         return new IterableAccessibleObject($node->getChildNodes($nodeTypeFilter, $limit, $offset));
                     }
                 ],
-                'nodeAllowedAsChildNode' => [
+                'isNodeAllowedAsChildNode' => [
                     'type' => Type::boolean(),
+                    'deprecationReason' => 'Not part of the public API',
+                    'description' => 'Whether the given node type would ba allowed as child node of this node according to the configured constraints',
                     'args' => [
                         'nodeType' => ['type' => Type::nonNull(Type::string())],
                     ],
@@ -79,10 +99,11 @@ class Node extends ObjectType
                         return $node->isNodeTypeAllowedAsChildNode($nodeType);
                     }
                 ],
-                'nodeByPath' => [
+                'node' => [
                     'type' => $typeResolver->get(Node::class),
+                    'description' => 'A node specified by the given relative path',
                     'args' => [
-                        'path' => ['type' => Type::nonNull($typeResolver->get(RelativeNodePath::class))],
+                        'path' => ['type' => Type::nonNull($typeResolver->get(Scalars\RelativeNodePath::class))],
                     ],
                     'resolve' => function (AccessibleObject $wrappedNode, array $args) {
                         /** @var NodeInterface $node */
@@ -92,10 +113,9 @@ class Node extends ObjectType
                 ],
                 'hasChildNodes' => [
                     'type' => Type::boolean(),
+                    'description' => 'Whether this node has any child nodes (that match the optional type filter)',
                     'args' => [
-                        'nodeTypeFilter' => [
-                            'type' => Type::string(),
-                        ],
+                        'nodeTypeFilter' => ['type' => Type::string()],
                     ],
                     'resolve' => function (AccessibleObject $wrappedNode, array $args) {
                         /** @var NodeInterface $node */
@@ -103,16 +123,19 @@ class Node extends ObjectType
                         return $node->hasChildNodes(isset($args['nodeTypeFilter']) ? $args['nodeTypeFilter'] : null);
                     }
                 ],
-                'nodeType' => ['type' => $typeResolver->get(NodeType::class)],
-                'dimensions' => ['type' => $typeResolver->get(Dimensions::class)],
-                'context' => ['type' => $typeResolver->get(Context::class)],
+                'nodeType' => ['type' => $typeResolver->get(NodeType::class), 'description' => 'The node type of this node'],
+                'dimensions' => ['type' => $typeResolver->get(Scalars\UnstructuredObjectScalar::class), 'deprecationReason' => 'Not part of the public API', 'description' => 'The content dimensions assigned to this node'],
+                'context' => ['type' => $typeResolver->get(Context::class), 'deprecationReason' => 'Not part of the public API', 'description' => 'The context of this node'],
                 'otherNodeVariants' => [
                     'type' => Type::listOf($typeResolver->get(Node::class)),
+                    'deprecationReason' => 'Not part of the public API',
+                    'description' => 'Other variants of this very node (with different dimension values)',
                     'resolve' => function (AccessibleObject $wrappedNode) {
                         /** @var NodeInterface $node */
                         $node = $wrappedNode->getObject();
                         return new IterableAccessibleObject($node->getOtherNodeVariants());
-                    }],
+                    }
+                ],
             ],
         ]);
     }

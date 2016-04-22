@@ -5,7 +5,7 @@ use TYPO3\Flow\Annotations as Flow;
 use TYPO3\Flow\Reflection\ObjectAccess;
 
 /**
- * A wrapper for arbitrary objects to expose all getters
+ * A wrapper for arbitrary objects to expose all getters via ArrayAccess
  *
  * @Flow\Proxy(false)
  */
@@ -42,6 +42,9 @@ class AccessibleObject implements \ArrayAccess
         if ($this->object === null) {
             return false;
         }
+        if (preg_match('/^(is|has)([A-Z])/', $propertyName) === 1) {
+            return is_callable([$this->object, $propertyName]);
+        }
         return ObjectAccess::isPropertyGettable($this->object, $propertyName);
     }
 
@@ -54,6 +57,9 @@ class AccessibleObject implements \ArrayAccess
     {
         if ($this->object === null) {
             return null;
+        }
+        if (preg_match('/^(is|has)([A-Z])/', $propertyName) === 1) {
+            return (boolean)call_user_func([$this->object, $propertyName]);
         }
         $result = ObjectAccess::getProperty($this->object, $propertyName);
         if ($result instanceof \Iterator) {
@@ -84,4 +90,5 @@ class AccessibleObject implements \ArrayAccess
     {
         throw new \RuntimeException('The AccessibleObject wrapper does not allow for mutation!', 1460895625);
     }
+
 }

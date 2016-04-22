@@ -1,26 +1,34 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types;
+namespace Wwwision\Neos\GraphQl\Types\Scalars;
 
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\TYPO3CR\Domain\Model\Workspace as NeosWorkspace;
+use TYPO3\TYPO3CR\Domain\Repository\WorkspaceRepository;
 
 /**
- * Scalar type wrapper for \DateTimeInterface values
+ * Scalar type wrapper for \TYPO3\TYPO3CR\Domain\Model\Workspace values
  */
-class DateTime extends ScalarType
+class Workspace extends ScalarType
 {
 
     /**
-     * @var string
+     * @Flow\Inject
+     * @var WorkspaceRepository
      */
-    public $name = 'DateTime';
+    protected $workspaceRepository;
 
     /**
      * @var string
      */
-    public $description = 'A Date and time, represented as ISO 8601 conform string';
+    public $name = 'WorkspaceScalar';
+
+    /**
+     * @var string
+     */
+    public $description = 'A workspace, represented by its name';
 
     /**
      * Note: The public constructor is needed because the parent constructor is protected, any other way?
@@ -31,36 +39,33 @@ class DateTime extends ScalarType
     }
 
     /**
-     * @param \DateTimeInterface $value
+     * @param NeosWorkspace $value
      * @return string
      */
     public function serialize($value)
     {
-        if (!$value instanceof \DateTimeInterface) {
+        if (!$value instanceof NeosWorkspace) {
             return null;
         }
-        return $value->format(DATE_ISO8601);
+        return $value->getName();
     }
 
     /**
      * @param string $value
-     * @return \DateTimeImmutable
+     * @return NeosWorkspace
      */
     public function parseValue($value)
     {
         if (!is_string($value)) {
             return null;
         }
-        $dateTime = \DateTimeImmutable::createFromFormat(DATE_ISO8601, $value);
-        if ($dateTime === false) {
-            return null;
-        }
-        return $dateTime;
+        /** @noinspection PhpUndefinedMethodInspection */
+        return $this->workspaceRepository->findOneByName($value);
     }
 
     /**
      * @param AstNode $valueAST
-     * @return \DateTimeImmutable
+     * @return NeosWorkspace
      */
     public function parseLiteral($valueAST)
     {

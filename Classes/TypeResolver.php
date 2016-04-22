@@ -5,6 +5,9 @@ use GraphQL\Type\Definition\ObjectType;
 use TYPO3\Flow\Annotations as Flow;
 
 /**
+ * A type resolver (aka factory) for GraphQL type definitions.
+ * This class is required in order to prevent multiple instantiation of the same type and to allow types to reference themselves
+ *
  * @Flow\Scope("singleton")
  */
 class TypeResolver

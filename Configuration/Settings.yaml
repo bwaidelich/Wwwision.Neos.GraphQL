@@ -3,13 +3,7 @@ TYPO3:
     security:
       authentication:
         providers:
-          Typo3BackendProvider:
-            label: 'Neos Backend'
-            provider: 'PersistedUsernamePasswordProvider'
+          'Typo3BackendProvider':
             requestPatterns:
+               # add the GraphQL controller to the Neos backend request patterns
               controllerObjectName: 'TYPO3\Neos\Controller\.*|TYPO3\Neos\Service\.*|TYPO3\Media\Controller\.*|Wwwision\Neos\GraphQl\.*'
-
-    mvc:
-      routes:
-        'Wwwision.Neos.GraphQl':
-          position: 'start'

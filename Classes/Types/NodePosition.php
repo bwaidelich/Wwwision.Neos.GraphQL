@@ -1,11 +1,12 @@
 <?php
 namespace Wwwision\Neos\GraphQl\Types;
 
-use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\EnumType;
-use GraphQL\Type\Definition\ScalarType;
 use TYPO3\Flow\Annotations as Flow;
 
+/**
+ * A GraphQL enum type definition describing the possible values for positions in node move mutations
+ */
 class NodePosition extends EnumType
 {
 

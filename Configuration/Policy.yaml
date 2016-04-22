@@ -2,13 +2,18 @@ privilegeTargets:
 
   'TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
 
+    'Wwwision.Neos.GraphQl:GraphiQL':
+      matcher: 'method(Wwwision\Neos\GraphQl\Controller\StandardController->indexAction())'
     'Wwwision.Neos.GraphQl:Endpoint':
-      matcher: 'method(Wwwision\Neos\GraphQl\Controller\StandardController->(index|query)Action())'
+      matcher: 'method(Wwwision\Neos\GraphQl\Controller\StandardController->queryAction())'
 
 roles:
 
-  'TYPO3.Flow:Everybody':
+  'TYPO3.Neos:Editor':
     privileges:
+      -
+        privilegeTarget: 'Wwwision.Neos.GraphQl:GraphiQL'
+        permission: GRANT
       -
         privilegeTarget: 'Wwwision.Neos.GraphQl:Endpoint'
         permission: GRANT

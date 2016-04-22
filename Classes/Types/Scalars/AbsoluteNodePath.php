@@ -1,5 +1,5 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types;
+namespace Wwwision\Neos\GraphQl\Types\Scalars;
 
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
@@ -15,7 +15,7 @@ class AbsoluteNodePath extends ScalarType
     /**
      * @var string
      */
-    public $name = 'AbsoluteNodePath';
+    public $name = 'AbsoluteNodePathScalar';
 
     /**
      * @var string
