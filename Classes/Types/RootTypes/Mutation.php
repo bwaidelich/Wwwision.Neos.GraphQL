@@ -55,18 +55,33 @@ class Mutation extends ObjectType
                     'description' => 'Mark a node "hidden" in a given context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context for this mutation'],
-                        'node' => ['type' => Type::nonNull($typeResolver->get(Scalars\NodeIdentifier::class)), 'description' => 'The node to hide'],
+                        'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to hide'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
 
-                        $node = Scalars\NodeIdentifier::isNodeIdentifier($args['node']) ? $context->getNodeByIdentifier($args['node']) : $context->getNode($args['node']);
-                        if ($node === null) {
-                            throw new \InvalidArgumentException(sprintf('The node "%s" could not be found', $args['node']), 1460046627);
-                        }
+                        $node = $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $node->setHidden(true);
 
                         return new AccessibleObject($node);
+                    },
+                ],
+                'createNode' => [
+                    'type' => $typeResolver->get(Node::class),
+                    'description' => 'Create a node in the given context and return it',
+                    'args' => [
+                        'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
+                        'referenceNode' => ['type' => Type::nonNull(Type::string()), 'description' => 'The reference node for this mutation'],
+                        'nodeData' => ['type' => Type::nonNull($typeResolver->get(Scalars\UnstructuredObjectScalar::class)), 'description' => ''],
+                        'position' => ['type' => Type::nonNull($typeResolver->get(NodePosition::class)), 'description' => 'Where to create the node to in relation to the reference node'],
+                    ],
+                    'resolve' => function ($_, $args) {
+                        $context = $this->contextFactory->create($args['context']);
+
+                        $referenceNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['referenceNode']);
+                        $createdNode = $this->nodeOperations->create($referenceNode, $args['nodeData'], $args['position']);
+
+                        return new AccessibleObject($createdNode);
                     },
                 ],
                 'moveNode' => [
@@ -74,22 +89,39 @@ class Mutation extends ObjectType
                     'description' => 'Move a node in the tree in the given context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
-                        'node' => ['type' => Type::nonNull($typeResolver->get(Scalars\NodeIdentifier::class)), 'description' => 'The node to move'],
+                        'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to move'],
                         'targetNode' => ['type' => Type::nonNull(Type::string()), 'description' => 'The reference node for this mutation'],
                         'position' => ['type' => Type::nonNull($typeResolver->get(NodePosition::class)), 'description' => 'Where to move the node to in relation to the target node'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
 
-                        $node = Scalars\NodeIdentifier::isNodeIdentifier($args['node']) ? $context->getNodeByIdentifier($args['node']) : $context->getNode($args['node']);
-                        if ($node === null) {
-                            throw new \InvalidArgumentException(sprintf('The node "%s" could not be found', $args['node']), 1460046627);
-                        }
-                        $targetNode = Scalars\NodeIdentifier::isNodeIdentifier($args['targetNode']) ? $context->getNodeByIdentifier($args['targetNode']) : $context->getNode($args['targetNode']);
-                        if ($targetNode === null) {
-                            throw new \InvalidArgumentException(sprintf('The targetNode "%s" could not be found', $args['node']), 1460046630);
-                        }
+                        $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
+                        $targetNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['targetNode']);
+
+                        // FIXME: We should not rely on the NodeOperations service from the Neos package
                         $this->nodeOperations->move($node, $targetNode, $args['position']);
+
+                        return new AccessibleObject($node);
+                    },
+                ],
+                'copyNode' => [
+                    'type' => $typeResolver->get(Node::class),
+                    'description' => 'Copies a node in the tree in the given context',
+                    'args' => [
+                        'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
+                        'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to copy'],
+                        'targetNode' => ['type' => Type::nonNull(Type::string()), 'description' => 'The reference node for this mutation'],
+                        'position' => ['type' => Type::nonNull($typeResolver->get(NodePosition::class)), 'description' => 'Where to copy the node to in relation to the target node'],
+                    ],
+                    'resolve' => function ($_, $args) {
+                        $context = $this->contextFactory->create($args['context']);
+
+                        $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
+                        $targetNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['targetNode']);
+
+                        // FIXME: We should not rely on the NodeOperations service from the Neos package
+                        $this->nodeOperations->copy($node, $targetNode, $args['position']);
 
                         return new AccessibleObject($node);
                     },
@@ -99,12 +131,12 @@ class Mutation extends ObjectType
                     'description' => 'Publish a node to some other workspace',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
-                        'node' => ['type' => Type::nonNull($typeResolver->get(Scalars\NodeIdentifier::class)), 'description' => 'The node to publish'],
+                        'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to publish'],
                         'targetWorkspace' => ['type' => $typeResolver->get(Scalars\Workspace::class), 'description' => 'The workspace to publish the node to'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
-                        $node = Scalars\NodeIdentifier::isNodeIdentifier($args['node']) ? $context->getNodeByIdentifier($args['node']) : $context->getNode($args['node']);
+                        $node = $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         if ($node === null) {
                             throw new \InvalidArgumentException(sprintf('The node "%s" could not be found', $args['node']), 1461086537);
                         }
@@ -118,17 +150,14 @@ class Mutation extends ObjectType
                     'description' => 'Publish the given nodes to another workspace',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
-                        'nodes' => ['type' => Type::nonNull(Type::listOf($typeResolver->get(Scalars\NodeIdentifier::class))), 'description' => 'The list of nodes to be published'],
+                        'nodes' => ['type' => Type::nonNull(Type::listOf($typeResolver->get(InputTypes\NodeIdentifierOrPath::class))), 'description' => 'The list of nodes to be published'],
                         'targetWorkspace' => ['type' => $typeResolver->get(Scalars\Workspace::class), 'description' => 'The workspace to publish the nodes to'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
                         $nodes = [];
                         foreach ($args['nodes'] as $nodePathOrIdentifier) {
-                            $node = Scalars\NodeIdentifier::isNodeIdentifier($nodePathOrIdentifier) ? $context->getNodeByIdentifier($nodePathOrIdentifier) : $context->getNode($nodePathOrIdentifier);
-                            if ($node === null) {
-                                throw new \InvalidArgumentException(sprintf('The node "%s" could not be found', $nodePathOrIdentifier), 1461086539);
-                            }
+                            $node = $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $nodePathOrIdentifier);
                             $nodes[] = $node;
                         }
                         $this->publishingService->publishNodes($nodes, isset($args['targetWorkspace']) ? $args['targetWorkspace'] : null);
@@ -155,14 +184,11 @@ class Mutation extends ObjectType
                     'description' => 'Discard all changes made to a node in a given CR context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
-                        'node' => ['type' => Type::nonNull($typeResolver->get(Scalars\NodeIdentifier::class)), 'description' => 'The node to discard'],
+                        'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to discard'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
-                        $node = Scalars\NodeIdentifier::isNodeIdentifier($args['node']) ? $context->getNodeByIdentifier($args['node']) : $context->getNode($args['node']);
-                        if ($node === null) {
-                            throw new \InvalidArgumentException(sprintf('The node "%s" could not be found', $args['node']), 1461086540);
-                        }
+                        $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $this->publishingService->discardNode($node);
 
                         return new AccessibleObject($node);
@@ -173,16 +199,13 @@ class Mutation extends ObjectType
                     'description' => 'Discard all changes made to a list of nodes in a given CR context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
-                        'nodes' => ['type' => Type::nonNull(Type::listOf($typeResolver->get(Scalars\NodeIdentifier::class))), 'description' => 'The nodes to discard'],
+                        'nodes' => ['type' => Type::nonNull(Type::listOf($typeResolver->get(InputTypes\NodeIdentifierOrPath::class))), 'description' => 'The nodes to discard'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
                         $nodes = [];
                         foreach ($args['nodes'] as $nodePathOrIdentifier) {
-                            $node = Scalars\NodeIdentifier::isNodeIdentifier($nodePathOrIdentifier) ? $context->getNodeByIdentifier($nodePathOrIdentifier) : $context->getNode($nodePathOrIdentifier);
-                            if ($node === null) {
-                                throw new \InvalidArgumentException(sprintf('The node "%s" could not be found', $nodePathOrIdentifier), 1461086543);
-                            }
+                            $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $nodePathOrIdentifier);
                             $nodes[] = $node;
                         }
                         $this->publishingService->discardNodes($nodes);

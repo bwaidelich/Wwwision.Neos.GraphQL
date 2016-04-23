@@ -66,9 +66,18 @@ class AbsoluteNodePath extends ScalarType
      */
     private function coerceNodePath($value)
     {
-        if (!is_string($value) || substr($value, 0, 1) !== '/') {
+        if (!self::isValid($value)) {
             return null;
         }
         return $value;
+    }
+
+    /**
+     * @param string $value
+     * @return bool
+     */
+    static public function isValid($value)
+    {
+        return (is_string($value) && substr($value, 0, 1) === '/');
     }
 }

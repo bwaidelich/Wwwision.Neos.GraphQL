@@ -1,25 +1,25 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types\Scalars;
+namespace Wwwision\Neos\GraphQl\Types\InputTypes;
 
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
 use TYPO3\Flow\Annotations as Flow;
+use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
+use TYPO3\TYPO3CR\Domain\Service\Context as CRContext;
+use Wwwision\Neos\GraphQl\Types\Scalars\AbsoluteNodePath;
+use Wwwision\Neos\GraphQl\Types\Scalars\NodeIdentifier;
 
 /**
- * Scalar type representing node identifiers (UUID)
+ * A node represented by its identifier (UUID) or absolute path
  */
-class NodeIdentifier extends ScalarType
+class NodeIdentifierOrPath extends ScalarType
 {
-    /**
-     * @var string
-     */
-    const PATTERN_MATCH_UUID = '/^([a-f0-9]){8}-([a-f0-9]){4}-([a-f0-9]){4}-([a-f0-9]){4}-([a-f0-9]){12}$/';
 
     /**
      * @var string
      */
-    public $name = 'NodeIdentifierScalar';
+    public $name = 'NodeIdentifierOrPathInputType';
 
     /**
      * @var string
@@ -68,9 +68,23 @@ class NodeIdentifier extends ScalarType
      * @param string $value
      * @return boolean
      */
-    static public function isValid($value)
+    static protected function isValid($value)
     {
-        return (is_string($value) && preg_match(self::PATTERN_MATCH_UUID, $value) === 1);
+        return NodeIdentifier::isValid($value) || AbsoluteNodePath::isValid($value);
+    }
+
+    /**
+     * @param CRContext $context
+     * @param string $nodePathOrIdentifier
+     * @return NodeInterface
+     */
+    static public function getNodeFromContext(CRContext $context, $nodePathOrIdentifier)
+    {
+        $node = NodeIdentifier::isValid($nodePathOrIdentifier) ? $context->getNodeByIdentifier($nodePathOrIdentifier) : $context->getNode($nodePathOrIdentifier);
+        if ($node === null) {
+            throw new \InvalidArgumentException(sprintf('The node "%s" could not be found in the given context', $nodePathOrIdentifier), 1461086543);
+        }
+        return $node;
     }
 
 }
