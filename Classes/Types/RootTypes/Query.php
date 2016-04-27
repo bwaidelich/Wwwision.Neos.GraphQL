@@ -1,5 +1,5 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types\RootTypes;
+namespace Wwwision\Neos\GraphQL\Types\RootTypes;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -7,14 +7,14 @@ use TYPO3\Flow\Annotations as Flow;
 use TYPO3\TYPO3CR\Domain\Repository\WorkspaceRepository;
 use TYPO3\TYPO3CR\Domain\Service\ContextFactoryInterface;
 use TYPO3\TYPO3CR\Domain\Service\NodeTypeManager;
-use Wwwision\Neos\GraphQl\TypeResolver;
-use Wwwision\Neos\GraphQl\Types\Context;
-use Wwwision\Neos\GraphQl\Types\Node;
-use Wwwision\Neos\GraphQl\Types\NodeType;
-use Wwwision\Neos\GraphQl\Types\Scalars;
-use Wwwision\Neos\GraphQl\Types\Workspace;
-use Wwwision\Neos\GraphQl\Types\Wrapper\AccessibleObject;
-use Wwwision\Neos\GraphQl\Types\Wrapper\IterableAccessibleObject;
+use Wwwision\GraphQL\AccessibleObject;
+use Wwwision\GraphQL\IterableAccessibleObject;
+use Wwwision\GraphQL\TypeResolver;
+use Wwwision\Neos\GraphQL\Types\Context;
+use Wwwision\Neos\GraphQL\Types\Node;
+use Wwwision\Neos\GraphQL\Types\NodeType;
+use Wwwision\Neos\GraphQL\Types\Scalars;
+use Wwwision\Neos\GraphQL\Types\Workspace;
 
 /**
  * A GraphQL root definition for all queries on the root level

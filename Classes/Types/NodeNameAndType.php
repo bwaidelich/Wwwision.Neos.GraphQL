@@ -1,9 +1,9 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types;
+namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use Wwwision\Neos\GraphQl\TypeResolver;
+use Wwwision\GraphQL\TypeResolver;
 
 /**
  * A GraphQL type definition wrapping a node name and its type

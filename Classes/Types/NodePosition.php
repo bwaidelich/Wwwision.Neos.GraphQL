@@ -1,5 +1,5 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types;
+namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\EnumType;
 use TYPO3\Flow\Annotations as Flow;

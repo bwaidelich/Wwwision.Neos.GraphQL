@@ -1,5 +1,5 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types\Scalars;
+namespace Wwwision\Neos\GraphQL\Types\Scalars;
 
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;

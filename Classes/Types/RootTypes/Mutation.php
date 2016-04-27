@@ -1,5 +1,5 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types\RootTypes;
+namespace Wwwision\Neos\GraphQL\Types\RootTypes;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
@@ -8,14 +8,14 @@ use TYPO3\Neos\Service\NodeOperations;
 use TYPO3\TYPO3CR\Domain\Model\Workspace as CRWorkspace;
 use TYPO3\TYPO3CR\Domain\Service\ContextFactoryInterface;
 use TYPO3\TYPO3CR\Domain\Service\PublishingServiceInterface;
-use Wwwision\Neos\GraphQl\TypeResolver;
-use Wwwision\Neos\GraphQl\Types\InputTypes;
-use Wwwision\Neos\GraphQl\Types\Node;
-use Wwwision\Neos\GraphQl\Types\NodePosition;
-use Wwwision\Neos\GraphQl\Types\Scalars;
-use Wwwision\Neos\GraphQl\Types\Workspace;
-use Wwwision\Neos\GraphQl\Types\Wrapper\AccessibleObject;
-use Wwwision\Neos\GraphQl\Types\Wrapper\IterableAccessibleObject;
+use Wwwision\GraphQL\AccessibleObject;
+use Wwwision\GraphQL\IterableAccessibleObject;
+use Wwwision\GraphQL\TypeResolver;
+use Wwwision\Neos\GraphQL\Types\InputTypes;
+use Wwwision\Neos\GraphQL\Types\Node;
+use Wwwision\Neos\GraphQL\Types\NodePosition;
+use Wwwision\Neos\GraphQL\Types\Scalars;
+use Wwwision\Neos\GraphQL\Types\Workspace;
 
 /**
  * A GraphQL root definition for all mutations on the root level
@@ -59,8 +59,7 @@ class Mutation extends ObjectType
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
-
-                        $node = $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
+                        $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $node->setHidden(true);
 
                         return new AccessibleObject($node);
@@ -71,14 +70,15 @@ class Mutation extends ObjectType
                     'description' => 'Create a node in the given context and return it',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
-                        'referenceNode' => ['type' => Type::nonNull(Type::string()), 'description' => 'The reference node for this mutation'],
+                        'referenceNode' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The reference node for this mutation'],
                         'nodeData' => ['type' => Type::nonNull($typeResolver->get(Scalars\UnstructuredObjectScalar::class)), 'description' => ''],
                         'position' => ['type' => Type::nonNull($typeResolver->get(NodePosition::class)), 'description' => 'Where to create the node to in relation to the reference node'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
-
                         $referenceNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['referenceNode']);
+
+                        // FIXME: We should not rely on the NodeOperations service from the Neos package
                         $createdNode = $this->nodeOperations->create($referenceNode, $args['nodeData'], $args['position']);
 
                         return new AccessibleObject($createdNode);
@@ -90,12 +90,11 @@ class Mutation extends ObjectType
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
                         'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to move'],
-                        'targetNode' => ['type' => Type::nonNull(Type::string()), 'description' => 'The reference node for this mutation'],
+                        'targetNode' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The reference node for this mutation'],
                         'position' => ['type' => Type::nonNull($typeResolver->get(NodePosition::class)), 'description' => 'Where to move the node to in relation to the target node'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
-
                         $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $targetNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['targetNode']);
 
@@ -111,12 +110,11 @@ class Mutation extends ObjectType
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
                         'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to copy'],
-                        'targetNode' => ['type' => Type::nonNull(Type::string()), 'description' => 'The reference node for this mutation'],
+                        'targetNode' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The reference node for this mutation'],
                         'position' => ['type' => Type::nonNull($typeResolver->get(NodePosition::class)), 'description' => 'Where to copy the node to in relation to the target node'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
-
                         $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $targetNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['targetNode']);
 

@@ -1,10 +1,11 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types\Scalars;
+namespace Wwwision\Neos\GraphQL\Types\Scalars;
 
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
 use TYPO3\Flow\Annotations as Flow;
+use Wwwision\GraphQL\IterableAccessibleObject;
 
 /**
  * Type scalar for unknown structures (represented as JSON object)
@@ -35,6 +36,9 @@ class UnstructuredObjectScalar extends ScalarType
      */
     public function serialize($value)
     {
+        if ($value instanceof IterableAccessibleObject) {
+            return iterator_to_array($value->getIterator());
+        }
         if (!is_array($value)) {
             return null;
         }

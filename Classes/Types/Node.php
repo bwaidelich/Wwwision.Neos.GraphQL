@@ -1,16 +1,16 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types;
+namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
 use TYPO3\TYPO3CR\Domain\Service\NodeTypeManager;
-use Wwwision\Neos\GraphQl\TypeResolver;
-use Wwwision\Neos\GraphQl\Types\Scalars\AbsoluteNodePath;
-use Wwwision\Neos\GraphQl\Types\Scalars\NodeIdentifier;
-use Wwwision\Neos\GraphQl\Types\Wrapper\AccessibleObject;
-use Wwwision\Neos\GraphQl\Types\Wrapper\IterableAccessibleObject;
+use Wwwision\GraphQL\AccessibleObject;
+use Wwwision\GraphQL\IterableAccessibleObject;
+use Wwwision\GraphQL\TypeResolver;
+use Wwwision\Neos\GraphQL\Types\Scalars\AbsoluteNodePath;
+use Wwwision\Neos\GraphQL\Types\Scalars\NodeIdentifier;
 
 /**
  * A GraphQL type definition describing a TYPO3\TYPO3CR\Domain\Model\NodeInterface
@@ -48,7 +48,7 @@ class Node extends ObjectType
                     }
                 ],
                 'propertyNames' => ['type' => Type::listOf(Type::string()), 'description' => 'The names of all properties of this node'],
-                'properties' => ['type' => $typeResolver->get(Scalars\UnstructuredObjectScalar::class), 'description' => 'All properties of this node'],
+                'properties' => ['type' => $typeResolver->get(Scalars\NodePropertiesScalar::class), 'description' => 'All properties of this node'],
                 'isHidden' => ['type' => Type::boolean(), 'description' => 'Whether this node is marked hidden'],
                 'hiddenBeforeDateTime' => ['type' => $typeResolver->get(Scalars\DateTime::class), 'description' => 'The date and time before which this node will be automatically hidden'],
                 'hiddenAfterDateTime' => ['type' => $typeResolver->get(Scalars\DateTime::class), 'description' => 'The node and time after which this node will be hidden'],

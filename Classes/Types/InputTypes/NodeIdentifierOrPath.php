@@ -1,5 +1,5 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types\InputTypes;
+namespace Wwwision\Neos\GraphQL\Types\InputTypes;
 
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
@@ -7,8 +7,8 @@ use GraphQL\Type\Definition\ScalarType;
 use TYPO3\Flow\Annotations as Flow;
 use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
 use TYPO3\TYPO3CR\Domain\Service\Context as CRContext;
-use Wwwision\Neos\GraphQl\Types\Scalars\AbsoluteNodePath;
-use Wwwision\Neos\GraphQl\Types\Scalars\NodeIdentifier;
+use Wwwision\Neos\GraphQL\Types\Scalars\AbsoluteNodePath;
+use Wwwision\Neos\GraphQL\Types\Scalars\NodeIdentifier;
 
 /**
  * A node represented by its identifier (UUID) or absolute path
@@ -19,7 +19,7 @@ class NodeIdentifierOrPath extends ScalarType
     /**
      * @var string
      */
-    public $name = 'NodeIdentifierOrPathInputType';
+    public $name = 'NodeIdentifierOrPath';
 
     /**
      * @var string

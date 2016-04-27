@@ -1,10 +1,10 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types\InputTypes;
+namespace Wwwision\Neos\GraphQL\Types\InputTypes;
 
 use GraphQL\Type\Definition\InputObjectType;
 use GraphQL\Type\Definition\Type;
-use Wwwision\Neos\GraphQl\TypeResolver;
-use Wwwision\Neos\GraphQl\Types\Scalars;
+use Wwwision\GraphQL\TypeResolver;
+use Wwwision\Neos\GraphQL\Types\Scalars;
 
 /**
  * A GraphQL input type definition for a \TYPO3\TYPO3CR\Domain\Service\Context

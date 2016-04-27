@@ -1,12 +1,12 @@
 <?php
-namespace Wwwision\Neos\GraphQl\Types;
+namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use TYPO3\TYPO3CR\Domain\Service\Context as TYPO3CRContext;
-use Wwwision\Neos\GraphQl\TypeResolver;
-use Wwwision\Neos\GraphQl\Types\Wrapper\AccessibleObject;
-use Wwwision\Neos\GraphQl\Types\Wrapper\IterableAccessibleObject;
+use Wwwision\GraphQL\AccessibleObject;
+use Wwwision\GraphQL\IterableAccessibleObject;
+use Wwwision\GraphQL\TypeResolver;
 
 /**
  * A GraphQL type definition describing a TYPO3\TYPO3CR\Domain\Service\Context
