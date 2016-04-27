@@ -5,7 +5,7 @@
     "license": "GPL-3.0+",
     "require": {
         "typo3/neos": "~2.1",
-        "wwwision/graphql": "dev-master"
+        "wwwision/graphql": "~1.0"
     },
     "autoload": {
         "psr-4": {
