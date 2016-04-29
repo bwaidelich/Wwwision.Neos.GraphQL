@@ -8,7 +8,7 @@ use TYPO3\Flow\Annotations as Flow;
 use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
 use TYPO3\TYPO3CR\Domain\Service\Context as CRContext;
 use Wwwision\Neos\GraphQL\Types\Scalars\AbsoluteNodePath;
-use Wwwision\Neos\GraphQL\Types\Scalars\NodeIdentifier;
+use Wwwision\Neos\GraphQL\Types\Scalars\Uuid;
 
 /**
  * A node represented by its identifier (UUID) or absolute path
@@ -70,7 +70,7 @@ class NodeIdentifierOrPath extends ScalarType
      */
     static protected function isValid($value)
     {
-        return NodeIdentifier::isValid($value) || AbsoluteNodePath::isValid($value);
+        return Uuid::isValid($value) || AbsoluteNodePath::isValid($value);
     }
 
     /**
@@ -80,7 +80,7 @@ class NodeIdentifierOrPath extends ScalarType
      */
     static public function getNodeFromContext(CRContext $context, $nodePathOrIdentifier)
     {
-        $node = NodeIdentifier::isValid($nodePathOrIdentifier) ? $context->getNodeByIdentifier($nodePathOrIdentifier) : $context->getNode($nodePathOrIdentifier);
+        $node = Uuid::isValid($nodePathOrIdentifier) ? $context->getNodeByIdentifier($nodePathOrIdentifier) : $context->getNode($nodePathOrIdentifier);
         if ($node === null) {
             throw new \InvalidArgumentException(sprintf('The node "%s" could not be found in the given context', $nodePathOrIdentifier), 1461086543);
         }

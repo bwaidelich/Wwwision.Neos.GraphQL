@@ -40,7 +40,7 @@ class Context extends ObjectType
                     'type' => $typeResolver->get(Node::class),
                     'description' => 'A node specified by its absolute path or identifier',
                     'args' => [
-                        'identifier' => ['type' => $typeResolver->get(Scalars\NodeIdentifier::class), 'description' => 'The node identifier (not the technical persistence id)'],
+                        'identifier' => ['type' => $typeResolver->get(Scalars\Uuid::class), 'description' => 'The node identifier (not the technical persistence id)'],
                         'path' => ['type' => $typeResolver->get(Scalars\AbsoluteNodePath::class), 'description' => 'The absolute node path in the form "/sites/some-site/some/path"'],
                     ],
                     'resolve' => function (AccessibleObject $wrappedNode, array $args) {
@@ -59,7 +59,7 @@ class Context extends ObjectType
                     'deprecationReason' => 'Not part of the public API',
                     'description' => 'All node variants for the given node identifier',
                     'args' => [
-                        'identifier' => ['type' => Type::nonNull($typeResolver->get(Scalars\NodeIdentifier::class))],
+                        'identifier' => ['type' => Type::nonNull($typeResolver->get(Scalars\Uuid::class))],
                     ],
                     'resolve' => function (AccessibleObject $wrappedNode, array $args) {
                         /** @var TYPO3CRContext $context */

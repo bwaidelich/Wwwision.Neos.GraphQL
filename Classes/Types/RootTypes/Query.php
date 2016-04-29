@@ -69,7 +69,7 @@ class Query extends ObjectType
                 'node' => [
                     'type' => $typeResolver->get(Node::class),
                     'args' => [
-                        'identifier' => ['type' => $typeResolver->get(Scalars\NodeIdentifier::class)],
+                        'identifier' => ['type' => $typeResolver->get(Scalars\Uuid::class)],
                         'path' => ['type' => $typeResolver->get(Scalars\AbsoluteNodePath::class)],
                     ],
                     'resolve' => function ($_, array $args) {

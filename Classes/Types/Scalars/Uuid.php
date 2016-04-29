@@ -9,7 +9,7 @@ use TYPO3\Flow\Annotations as Flow;
 /**
  * Scalar type representing node identifiers (UUID)
  */
-class NodeIdentifier extends ScalarType
+class Uuid extends ScalarType
 {
     /**
      * @var string
@@ -19,12 +19,12 @@ class NodeIdentifier extends ScalarType
     /**
      * @var string
      */
-    public $name = 'NodeIdentifierScalar';
+    public $name = 'UUID';
 
     /**
      * @var string
      */
-    public $description = 'A node identifier represented as UUID string';
+    public $description = 'A UUID represented as string';
 
     /**
      * Note: The public constructor is needed because the parent constructor is protected, any other way?

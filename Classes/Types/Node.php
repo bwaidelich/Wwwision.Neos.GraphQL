@@ -10,7 +10,7 @@ use Wwwision\GraphQL\AccessibleObject;
 use Wwwision\GraphQL\IterableAccessibleObject;
 use Wwwision\GraphQL\TypeResolver;
 use Wwwision\Neos\GraphQL\Types\Scalars\AbsoluteNodePath;
-use Wwwision\Neos\GraphQL\Types\Scalars\NodeIdentifier;
+use Wwwision\Neos\GraphQL\Types\Scalars\Uuid;
 
 /**
  * A GraphQL type definition describing a TYPO3\TYPO3CR\Domain\Model\NodeInterface
@@ -63,7 +63,7 @@ class Node extends ObjectType
                 'contextPath' => ['type' => Type::string(), 'description' => 'The absolute path of this node including context information'],
                 'depth' => ['type' => Type::int(), 'description' => 'The level at which this node is located in the tree'],
                 'workspace' => ['type' => $typeResolver->get(Workspace::class), 'description' => 'The workspace this node is contained in'],
-                'identifier' => ['type' => $typeResolver->get(NodeIdentifier::class), 'description' => 'The identifier of this node (not the technical id)'],
+                'identifier' => ['type' => $typeResolver->get(Uuid::class), 'description' => 'The identifier of this node (not the technical id)'],
                 'index' => ['type' => Type::int(), 'deprecationReason' => 'Not part of the public API', 'description' => 'The index of this node among its siblings'],
                 'parent' => ['type' => $typeResolver->get(Node::class), 'description' => 'The parent node of this node'],
                 'parentPath' => ['type' => $typeResolver->get(AbsoluteNodePath::class), 'description' => 'The parent node path'],
