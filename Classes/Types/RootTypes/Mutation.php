@@ -4,18 +4,17 @@ namespace Wwwision\Neos\GraphQL\Types\RootTypes;
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
 use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Neos\Service\NodeOperations;
+use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
 use TYPO3\TYPO3CR\Domain\Model\Workspace as CRWorkspace;
 use TYPO3\TYPO3CR\Domain\Service\ContextFactoryInterface;
+use TYPO3\TYPO3CR\Domain\Service\NodeServiceInterface;
 use TYPO3\TYPO3CR\Domain\Service\PublishingServiceInterface;
-use Wwwision\GraphQL\AccessibleObject;
-use Wwwision\GraphQL\IterableAccessibleObject;
+use TYPO3\TYPO3CR\Domain\Utility\NodePaths;
 use Wwwision\GraphQL\TypeResolver;
 use Wwwision\Neos\GraphQL\Types\InputTypes;
-use Wwwision\Neos\GraphQL\Types\Node;
+use Wwwision\Neos\GraphQL\Types\MutationResult;
 use Wwwision\Neos\GraphQL\Types\NodePosition;
 use Wwwision\Neos\GraphQL\Types\Scalars;
-use Wwwision\Neos\GraphQL\Types\Workspace;
 
 /**
  * A GraphQL root definition for all mutations on the root level
@@ -30,9 +29,9 @@ class Mutation extends ObjectType
 
     /**
      * @Flow\Inject
-     * @var NodeOperations
+     * @var NodeServiceInterface
      */
-    protected $nodeOperations;
+    protected $nodeService;
 
     /**
      * @Flow\Inject
@@ -51,7 +50,7 @@ class Mutation extends ObjectType
             'description' => 'Mutations for the Neos Content Repository',
             'fields' => [
                 'hideNode' => [
-                    'type' => $typeResolver->get(Node::class),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Mark a node "hidden" in a given context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context for this mutation'],
@@ -62,30 +61,63 @@ class Mutation extends ObjectType
                         $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $node->setHidden(true);
 
-                        return new AccessibleObject($node);
+                        return ['success' => true];
+                    },
+                ],
+                'removeNode' => [
+                    'type' => $typeResolver->get(MutationResult::class),
+                    'description' => 'Removes a node from the given context',
+                    'args' => [
+                        'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context for this mutation'],
+                        'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to remove'],
+                    ],
+                    'resolve' => function ($_, $args) {
+                        $context = $this->contextFactory->create($args['context']);
+                        $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
+                        $node->remove();
+
+                        return ['success' => true];
                     },
                 ],
                 'createNode' => [
-                    'type' => $typeResolver->get(Node::class),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Create a node in the given context and return it',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
                         'referenceNode' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The reference node for this mutation'],
-                        'nodeData' => ['type' => Type::nonNull($typeResolver->get(Scalars\UnstructuredObjectScalar::class)), 'description' => ''],
                         'position' => ['type' => Type::nonNull($typeResolver->get(NodePosition::class)), 'description' => 'Where to create the node to in relation to the reference node'],
+                        'nodeType' => ['type' => $typeResolver->get(InputTypes\NodeType::class), 'description' => 'Optional type of node to create (if omitted an unstructured node is created)'],
+                        'properties' => ['type' => $typeResolver->get(Scalars\UnstructuredObjectScalar::class), 'description' => 'Optional properties of the new node'],
+                        'name' => ['type' => Type::string(), 'description' => 'Optional proposed node name (if not unique this will be tampered)'],
+                        'identifier' => ['type' => $typeResolver->get(Scalars\Uuid::class), 'description' => 'Optional unique identifier of the node to create (use with care!)'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
                         $referenceNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['referenceNode']);
+                        $designatedParentNode = $this->getDesignatedParentNode($referenceNode, $args['position']);
 
-                        // FIXME: We should not rely on the NodeOperations service from the Neos package
-                        $createdNode = $this->nodeOperations->create($referenceNode, $args['nodeData'], $args['position']);
+                        // Note: The following lines are "inspired" from the NodeOperations service from the Neos package. We plan to move this logic into the CR package at some point
+                        $proposedNodeName = isset($args['name']) ? $args['name'] : null;
+                        $nodeName = $this->nodeService->generateUniqueNodeName($designatedParentNode->getPath(), $proposedNodeName);
+                        $nodeType = isset($args['nodeType']) ? $args['nodeType'] : null;
+                        $nodeIdentifier = isset($args['identifier']) ? $args['identifier'] : null;
+                        $newNode = $designatedParentNode->createNode($nodeName, $nodeType, $nodeIdentifier);
+                        if ($args['position'] === 'before') {
+                            $newNode->moveBefore($referenceNode);
+                        } elseif ($args['position'] === 'after') {
+                            $newNode->moveAfter($referenceNode);
+                        }
 
-                        return new AccessibleObject($createdNode);
+                        if (isset($args['properties'])) {
+                            foreach ($args['properties'] as $propertyName => $propertyValue) {
+                                $newNode->setProperty($propertyName, $propertyValue);
+                            }
+                        }
+                        return ['success' => true];
                     },
                 ],
                 'moveNode' => [
-                    'type' => $typeResolver->get(Node::class),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Move a node in the tree in the given context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
@@ -98,34 +130,68 @@ class Mutation extends ObjectType
                         $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $targetNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['targetNode']);
 
-                        // FIXME: We should not rely on the NodeOperations service from the Neos package
-                        $this->nodeOperations->move($node, $targetNode, $args['position']);
+                        // Note: The following lines are "inspired" from the NodeOperations service from the Neos package. We plan to move this logic into the CR package at some point
+                        $designatedParentNode = $this->getDesignatedParentNode($targetNode, $args['position']);
+                        // If we stay inside the same parent we basically just reorder, no rename needed or wanted.
+                        if ($designatedParentNode !== $node->getParent()) {
+                            $designatedNodePath = NodePaths::addNodePathSegment($designatedParentNode->getPath(), $node->getName());
+                            if ($this->nodeService->nodePathAvailableForNode($designatedNodePath, $node) === false) {
+                                $nodeName = $this->nodeService->generateUniqueNodeName($designatedParentNode->getPath(), $node->getName());
+                                if ($nodeName !== $node->getName()) {
+                                    $node->setName($nodeName);
+                                }
+                            }
+                        }
+                        switch ($args['position']) {
+                            case 'before':
+                                $node->moveBefore($targetNode);
+                                break;
+                            case 'into':
+                                $node->moveInto($targetNode);
+                                break;
+                            case 'after':
+                                $node->moveAfter($targetNode);
+                        }
 
-                        return new AccessibleObject($node);
+                        return ['success' => true];
                     },
                 ],
                 'copyNode' => [
-                    'type' => $typeResolver->get(Node::class),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Copies a node in the tree in the given context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
                         'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to copy'],
                         'targetNode' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The reference node for this mutation'],
                         'position' => ['type' => Type::nonNull($typeResolver->get(NodePosition::class)), 'description' => 'Where to copy the node to in relation to the target node'],
+                        'name' => ['type' => Type::string(), 'description' => 'Optional proposed node name for the new copy (if not unique this will be tampered)'],
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
                         $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $targetNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['targetNode']);
 
-                        // FIXME: We should not rely on the NodeOperations service from the Neos package
-                        $this->nodeOperations->copy($node, $targetNode, $args['position']);
+                        // Note: The following lines are "inspired" from the NodeOperations service from the Neos package. We plan to move this logic into the CR package at some point
+                        $proposedNodeName = isset($args['name']) ? $args['name'] : null;
+                        $nodeName = $this->nodeService->generateUniqueNodeName($this->getDesignatedParentNode($targetNode, $args['position'])->getPath(), $proposedNodeName);
 
-                        return new AccessibleObject($node);
+                        switch ($args['position']) {
+                            case 'before':
+                                $node->copyBefore($targetNode, $nodeName);
+                                break;
+                            case 'after':
+                                $node->copyAfter($targetNode, $nodeName);
+                                break;
+                            case 'into':
+                            default:
+                                $node->copyInto($targetNode, $nodeName);
+                        }
+
+                        return ['success' => true];
                     },
                 ],
                 'publishNode' => [
-                    'type' => $typeResolver->get(Node::class),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Publish a node to some other workspace',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
@@ -140,11 +206,11 @@ class Mutation extends ObjectType
                         }
                         $this->publishingService->publishNode($node, isset($args['targetWorkspace']) ? $args['targetWorkspace'] : null);
 
-                        return new AccessibleObject($node);
+                        return ['success' => true];
                     },
                 ],
                 'publishNodes' => [
-                    'type' => Type::listOf($typeResolver->get(Node::class)),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Publish the given nodes to another workspace',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
@@ -160,25 +226,31 @@ class Mutation extends ObjectType
                         }
                         $this->publishingService->publishNodes($nodes, isset($args['targetWorkspace']) ? $args['targetWorkspace'] : null);
 
-                        return new IterableAccessibleObject($nodes);
+                        return ['success' => true];
                     },
                 ],
                 'publishWorkspace' => [
-                    'type' => $typeResolver->get(Workspace::class),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Publish all nodes of a given workspace',
                     'args' => [
                         'workspace' => ['type' => Type::nonNull($typeResolver->get(Scalars\Workspace::class)), 'description' => 'The workspace to publish'],
-                        'targetWorkspace' => ['type' => Type::nonNull($typeResolver->get(Scalars\Workspace::class)), 'description' => 'The target workspace all nodes should be published to'],
+                        'targetWorkspace' => ['type' => $typeResolver->get(Scalars\Workspace::class), 'description' => 'Optional target workspace all nodes should be published to (if omitted the workspace\'s base workspace is assumed)'],
                     ],
                     'resolve' => function ($_, $args) {
                         /** @var CRWorkspace $workspace */
                         $workspace = $args['workspace'];
-                        $workspace->publish($args['targetWorkspace']);
-                        return new AccessibleObject($workspace);
+                        $targetWorkspace = isset($args['targetWorkspace']) ? $args['targetWorkspace'] : null;
+
+                        // Note: We don't use Workspace::publish() because that does not trigger signals to flush caches etc..
+
+                        $unpublishedNodes = $this->publishingService->getUnpublishedNodes($workspace);
+                        $this->publishingService->publishNodes($unpublishedNodes, $targetWorkspace);
+
+                        return ['success' => true];
                     },
                 ],
                 'discardNode' => [
-                    'type' => $typeResolver->get(Node::class),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Discard all changes made to a node in a given CR context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
@@ -189,11 +261,11 @@ class Mutation extends ObjectType
                         $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         $this->publishingService->discardNode($node);
 
-                        return new AccessibleObject($node);
+                        return ['success' => true];
                     },
                 ],
                 'discardNodes' => [
-                    'type' => Type::listOf($typeResolver->get(Node::class)),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Discard all changes made to a list of nodes in a given CR context',
                     'args' => [
                         'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
@@ -208,21 +280,37 @@ class Mutation extends ObjectType
                         }
                         $this->publishingService->discardNodes($nodes);
 
-                        return new IterableAccessibleObject($nodes);
+                        return ['success' => true];
                     },
                 ],
                 'discardAllNodes' => [
-                    'type' => $typeResolver->get(Workspace::class),
+                    'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Discard all changes to all nodes of a given workspace',
                     'args' => [
                         'workspace' => ['type' => Type::nonNull($typeResolver->get(Scalars\Workspace::class)), 'description' => 'The workspace for which nodes should be discarded'],
                     ],
                     'resolve' => function ($_, $args) {
                         $this->publishingService->discardAllNodes($args['workspace']);
-                        return new AccessibleObject($args['workspace']);
+
+                        return ['success' => true];
                     },
                 ],
             ]
         ]);
+    }
+
+    /**
+     * @param NodeInterface $targetNode
+     * @param string $position
+     * @return NodeInterface
+     */
+    protected function getDesignatedParentNode(NodeInterface $targetNode, $position)
+    {
+        $referenceNode = $targetNode;
+        if (in_array($position, array('before', 'after'))) {
+            $referenceNode = $targetNode->getParent();
+        }
+
+        return $referenceNode;
     }
 }

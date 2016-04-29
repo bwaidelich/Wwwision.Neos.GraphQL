@@ -34,7 +34,7 @@ Here are some random snapshots of the package in action:
 
 ![](graphiql_02.png)
 
-### Move a node into another node
+### Move a node into another node and publish the workspace
 
 ![](graphiql_03.png)
 
@@ -53,6 +53,6 @@ are likely to change:
 
 * The package key/namespace - I'm not happy with the current name. But if we happen to use it for the Neos Backend this
   will should be moved to the neos vendor namespace anyways.
-* The return types of mutations - Currently they return the just created/modified type, but it probably makes sense to
-  come up with a more generic result type that also allows for asynchronous implementations
+* The return types of mutations - Currently they return a `MutationResult` with one success flag. This allows us to
+  change the implementation to be asynchronous without breaking the types. But the current type is not very useful.
 * Some details of the type definitions might need to be revised
