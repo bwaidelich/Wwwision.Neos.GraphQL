@@ -7,10 +7,12 @@ use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Repository\WorkspaceRepository;
 use Neos\ContentRepository\Domain\Service\ContextFactoryInterface;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
+use Neos\Neos\Domain\Service\NodeSearchService;
 use Wwwision\GraphQL\AccessibleObject;
 use Wwwision\GraphQL\IterableAccessibleObject;
 use Wwwision\GraphQL\TypeResolver;
 use Wwwision\Neos\GraphQL\Types\Context;
+use Wwwision\Neos\GraphQL\Types\InputTypes\NodeIdentifierOrPath;
 use Wwwision\Neos\GraphQL\Types\Node;
 use Wwwision\Neos\GraphQL\Types\NodeType;
 use Wwwision\Neos\GraphQL\Types\Scalars;
@@ -39,6 +41,12 @@ class Query extends ObjectType
      * @var NodeTypeManager
      */
     protected $nodeTypeManager;
+
+    /**
+     * @Flow\Inject
+     * @var NodeSearchService
+     */
+    protected $nodeSearchService;
 
     /**
      * @param TypeResolver $typeResolver
@@ -154,6 +162,21 @@ class Query extends ObjectType
                     ],
                     'resolve' => function ($_, array $args) {
                         return $this->nodeTypeManager->hasNodeType($args['nodeTypeName']);
+                    }
+                ],
+
+                'nodesByProperties' => [
+                    'type' => Type::listOf($typeResolver->get(Node::class)),
+                    'description' => 'Find nodes recursively in the default context, using the NodeSearchService',
+                    'args' => [
+                        'term' => ['type' => Type::nonNull(Type::string()), 'description' => 'Arbitrary search term'],
+                        'searchNodeTypes' => ['type' => Type::nonNull(Type::listOf(Type::string())), 'description' => 'Simple array of Node type names to include in the search result'],
+                        'startingPoint' => ['type' => $typeResolver->get(NodeIdentifierOrPath::class), 'description' => 'Optional starting point for the search'],
+                    ],
+                    'resolve' => function ($_, array $args) {
+                        $defaultContext = $this->contextFactory->create();
+                        $startingPoint = isset($args['startingPoint']) ? NodeIdentifierOrPath::getNodeFromContext($defaultContext, $args['startingPoint']) : null;
+                        return new IterableAccessibleObject($this->nodeSearchService->findByProperties($args['term'], $args['searchNodeTypes'], $defaultContext, $startingPoint));
                     }
                 ],
             ]
