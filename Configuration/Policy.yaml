@@ -1,6 +1,6 @@
 privilegeTargets:
 
-  'TYPO3\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
+  'Neos\Flow\Security\Authorization\Privilege\Method\MethodPrivilege':
 
     'Wwwision.Neos.GraphQL:GraphiQL':
       matcher: 'method(Wwwision\GraphQL\Controller\StandardController->indexAction(endpoint == "neos/graphql"))'
@@ -10,7 +10,7 @@ privilegeTargets:
 roles:
 
   # grant neos editors access to the "neos/graphql" endpoint
-  'TYPO3.Neos:Editor':
+  'Neos.Neos:Editor':
     privileges:
       -
         privilegeTarget: 'Wwwision.Neos.GraphQL:GraphiQL'

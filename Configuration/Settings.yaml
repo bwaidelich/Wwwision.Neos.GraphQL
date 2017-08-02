@@ -1,24 +1,24 @@
 # add the GraphQL controller to the Neos backend request patterns
-TYPO3:
+
+Wwwision:
+  GraphQL:
+    endpoints:
+      neos/graphql:
+        querySchema: Wwwision\Neos\GraphQL\Types\RootTypes\Query
+        mutationSchema: Wwwision\Neos\GraphQL\Types\RootTypes\Mutation
+Neos:
   Flow:
     security:
       authentication:
         providers:
-          'Typo3BackendProvider':
+          'Neos.Neos:Backend':
             requestPatterns:
-              controllerObjectName: 'TYPO3\Neos\Controller\.*|TYPO3\Neos\Service\.*|TYPO3\Media\Controller\.*|Wwwision\GraphQL\.*'
-
-# add routes for the GraphQL endpoint and GraphiQL IDE
+              'Wwwision.Neos.GraphQL:controllerObjectName':
+                pattern: ControllerObjectName
+                patternOptions:
+                  controllerObjectNamePattern: 'Wwwision\GraphQL\.*'
     mvc:
       routes:
-        'Wwwision.GraphQL':
+        Wwwision.GraphQL:
           variables:
-            'endpoint': 'neos/graphql'
-
-# register GrpahQL endpoint and root query/mutation
-Wwwision:
-  GraphQL:
-    endpoints:
-      'neos/graphql':
-        'querySchema': 'Wwwision\Neos\GraphQL\Types\RootTypes\Query'
-        'mutationSchema': 'Wwwision\Neos\GraphQL\Types\RootTypes\Mutation'
+            endpoint: neos/graphql

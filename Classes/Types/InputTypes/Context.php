@@ -7,7 +7,7 @@ use Wwwision\GraphQL\TypeResolver;
 use Wwwision\Neos\GraphQL\Types\Scalars;
 
 /**
- * A GraphQL input type definition for a \TYPO3\TYPO3CR\Domain\Service\Context
+ * A GraphQL input type definition for a \Neos\ContentRepository\Domain\Service\Context
  */
 class Context extends InputObjectType
 {
@@ -19,7 +19,7 @@ class Context extends InputObjectType
     {
         return parent::__construct([
             'name' => 'ContextInput',
-            'description' => 'Input type for the TYPO3CR context',
+            'description' => 'Input type for the Content Repository Context',
             'fields' => [
                 'workspaceName' => ['type' => Type::string(), 'description' => 'The workspace of this context, e.g. "live" or "user-admin"'],
                 'currentDateTime' => ['type' => $typeResolver->get(Scalars\DateTime::class), 'description' => 'Simulated date & time, defaults to the current server time (ISO 8601 format)'],

@@ -3,9 +3,9 @@ namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
-use TYPO3\TYPO3CR\Domain\Service\NodeTypeManager;
+use Neos\Flow\Annotations as Flow;
+use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Wwwision\GraphQL\AccessibleObject;
 use Wwwision\GraphQL\IterableAccessibleObject;
 use Wwwision\GraphQL\TypeResolver;
@@ -13,7 +13,7 @@ use Wwwision\Neos\GraphQL\Types\Scalars\AbsoluteNodePath;
 use Wwwision\Neos\GraphQL\Types\Scalars\Uuid;
 
 /**
- * A GraphQL type definition describing a TYPO3\TYPO3CR\Domain\Model\NodeInterface
+ * A GraphQL type definition describing a Neos\ContentRepository\Domain\Model\NodeInterface
  */
 class Node extends ObjectType
 {

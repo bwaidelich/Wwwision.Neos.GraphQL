@@ -4,7 +4,7 @@ namespace Wwwision\Neos\GraphQL\Types\Scalars;
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
-use TYPO3\Flow\Annotations as Flow;
+use Neos\Flow\Annotations as Flow;
 
 /**
  * Scalar type representing node identifiers (UUID)

@@ -4,12 +4,12 @@ namespace Wwwision\Neos\GraphQL\Types\Scalars;
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\TYPO3CR\Domain\Model\Workspace as NeosWorkspace;
-use TYPO3\TYPO3CR\Domain\Repository\WorkspaceRepository;
+use Neos\Flow\Annotations as Flow;
+use Neos\ContentRepository\Domain\Model\Workspace as NeosWorkspace;
+use Neos\ContentRepository\Domain\Repository\WorkspaceRepository;
 
 /**
- * Scalar type wrapper for \TYPO3\TYPO3CR\Domain\Model\Workspace values
+ * Scalar type wrapper for \Neos\ContentRepository\Domain\Model\Workspace values
  */
 class Workspace extends ScalarType
 {

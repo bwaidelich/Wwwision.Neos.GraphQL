@@ -4,12 +4,12 @@ namespace Wwwision\Neos\GraphQL\Types\InputTypes;
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
-use TYPO3\TYPO3CR\Domain\Model\NodeType as CRNodeType;
-use TYPO3\TYPO3CR\Domain\Service\Context as CRContext;
-use TYPO3\TYPO3CR\Domain\Service\NodeTypeManager;
-use TYPO3\TYPO3CR\Exception\NodeTypeNotFoundException;
+use Neos\Flow\Annotations as Flow;
+use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\ContentRepository\Domain\Model\NodeType as CRNodeType;
+use Neos\ContentRepository\Domain\Service\Context as CRContext;
+use Neos\ContentRepository\Domain\Service\NodeTypeManager;
+use Neos\ContentRepository\Exception\NodeTypeNotFoundException;
 use Wwwision\Neos\GraphQL\Types\Scalars\AbsoluteNodePath;
 use Wwwision\Neos\GraphQL\Types\Scalars\Uuid;
 

@@ -4,9 +4,9 @@ namespace Wwwision\Neos\GraphQL\Types\Scalars;
 use GraphQL\Language\AST\Node as AstNode;
 use GraphQL\Language\AST\StringValue;
 use GraphQL\Type\Definition\ScalarType;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\Media\Domain\Model\ResourceBasedInterface;
-use TYPO3\TYPO3CR\Domain\Model\NodeInterface;
+use Neos\Flow\Annotations as Flow;
+use Neos\Media\Domain\Model\ResourceBasedInterface;
+use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Wwwision\GraphQL\IterableAccessibleObject;
 
 /**

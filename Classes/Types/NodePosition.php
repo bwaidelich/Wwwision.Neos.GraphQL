@@ -2,7 +2,7 @@
 namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\EnumType;
-use TYPO3\Flow\Annotations as Flow;
+use Neos\Flow\Annotations as Flow;
 
 /**
  * A GraphQL enum type definition describing the possible values for positions in node move mutations

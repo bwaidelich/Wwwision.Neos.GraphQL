@@ -3,15 +3,15 @@ namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\TYPO3CR\Domain\Model\Workspace as CRWorkspace;
-use TYPO3\TYPO3CR\Domain\Service\PublishingServiceInterface;
+use Neos\Flow\Annotations as Flow;
+use Neos\ContentRepository\Domain\Model\Workspace as CRWorkspace;
+use Neos\ContentRepository\Domain\Service\PublishingServiceInterface;
 use Wwwision\GraphQL\AccessibleObject;
 use Wwwision\GraphQL\IterableAccessibleObject;
 use Wwwision\GraphQL\TypeResolver;
 
 /**
- * A GraphQL type definition describing a TYPO3\TYPO3CR\Domain\Model\Workspace
+ * A GraphQL type definition describing a Neos\ContentRepository\Domain\Model\Workspace
  */
 class Workspace extends ObjectType
 {

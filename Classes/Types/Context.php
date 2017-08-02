@@ -3,13 +3,13 @@ namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use TYPO3\TYPO3CR\Domain\Service\Context as TYPO3CRContext;
+use Neos\ContentRepository\Domain\Service\Context as ContentRepositoryContext;
 use Wwwision\GraphQL\AccessibleObject;
 use Wwwision\GraphQL\IterableAccessibleObject;
 use Wwwision\GraphQL\TypeResolver;
 
 /**
- * A GraphQL type definition describing a TYPO3\TYPO3CR\Domain\Service\Context
+ * A GraphQL type definition describing a Neos\ContentRepository\Domain\Service\Context
  */
 class Context extends ObjectType
 {
@@ -28,7 +28,7 @@ class Context extends ObjectType
                     'description' => 'Workspace of this context',
                     'resolve' => function (AccessibleObject $wrappedNode) {
                         // NOTE: Context::getWorkspace() implicitly create the workspace by default, that's why we have to override this method here!
-                        /** @var TYPO3CRContext $context */
+                        /** @var ContentRepositoryContext $context */
                         $context = $wrappedNode->getObject();
                         return new AccessibleObject($context->getWorkspace(false));
                     }
@@ -44,7 +44,7 @@ class Context extends ObjectType
                         'path' => ['type' => $typeResolver->get(Scalars\AbsoluteNodePath::class), 'description' => 'The absolute node path in the form "/sites/some-site/some/path"'],
                     ],
                     'resolve' => function (AccessibleObject $wrappedNode, array $args) {
-                        /** @var TYPO3CRContext $context */
+                        /** @var ContentRepositoryContext $context */
                         $context = $wrappedNode->getObject();
                         if (isset($args['identifier'])) {
                             return new AccessibleObject($context->getNodeByIdentifier($args['identifier']));
@@ -62,7 +62,7 @@ class Context extends ObjectType
                         'identifier' => ['type' => Type::nonNull($typeResolver->get(Scalars\Uuid::class))],
                     ],
                     'resolve' => function (AccessibleObject $wrappedNode, array $args) {
-                        /** @var TYPO3CRContext $context */
+                        /** @var ContentRepositoryContext $context */
                         $context = $wrappedNode->getObject();
                         return new IterableAccessibleObject($context->getNodeVariantsByIdentifier($args['identifier']));
                     }
@@ -75,7 +75,7 @@ class Context extends ObjectType
                         'endPoint' => ['type' => Type::nonNull($typeResolver->get(Scalars\AbsoluteNodePath::class)), 'description' => 'Either an absolute path or an actual node specifying the end point, for example /sites/mysitecom/homepage/subpage'],
                     ],
                     'resolve' => function (AccessibleObject $wrappedNode, array $args) {
-                        /** @var TYPO3CRContext $context */
+                        /** @var ContentRepositoryContext $context */
                         $context = $wrappedNode->getObject();
 
                         return new IterableAccessibleObject($context->getNodesOnPath($args['startingPoint'], $args['endPoint']));

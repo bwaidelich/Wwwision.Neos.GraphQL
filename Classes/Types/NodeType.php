@@ -3,15 +3,15 @@ namespace Wwwision\Neos\GraphQL\Types;
 
 use GraphQL\Type\Definition\ObjectType;
 use GraphQL\Type\Definition\Type;
-use TYPO3\Flow\Annotations as Flow;
-use TYPO3\TYPO3CR\Domain\Model\NodeType as CRNodeType;
-use TYPO3\TYPO3CR\Domain\Service\NodeTypeManager;
+use Neos\Flow\Annotations as Flow;
+use Neos\ContentRepository\Domain\Model\NodeType as CRNodeType;
+use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Wwwision\GraphQL\AccessibleObject;
 use Wwwision\GraphQL\IterableAccessibleObject;
 use Wwwision\GraphQL\TypeResolver;
 
 /**
- * A GraphQL type definition describing a TYPO3\TYPO3CR\Domain\Model\NodeType
+ * A GraphQL type definition describing a Neos\ContentRepository\Domain\Model\NodeType
  */
 class NodeType extends ObjectType
 {
@@ -30,7 +30,7 @@ class NodeType extends ObjectType
             'name' => 'NodeType',
             'description' => 'A node type',
             'fields' => [
-                'name' => ['type' => Type::string(), 'description' => 'Name of this node type, e.g. "TYPO3CR:Folder"'],
+                'name' => ['type' => Type::string(), 'description' => 'Name of this node type, e.g. "Neos.Neos:Document"'],
                 'isAbstract' => ['type' => Type::boolean(), 'deprecationReason' => 'Not part of the public API', 'description' => 'Whether or not this node type is marked abstract', 'resolve' => function (AccessibleObject $wrappedNodeType) { return $wrappedNodeType->getObject()->isAbstract(); }],
                 'isFinal' => ['type' => Type::boolean(), 'deprecationReason' => 'Not part of the public API', 'description' => 'Whether or not this node type is marked final', 'resolve' => function (AccessibleObject $wrappedNodeType) { return $wrappedNodeType->getObject()->isFinal(); }],
                 'declaredSuperTypes' => ['type' => Type::listOf($typeResolver->get(NodeType::class)), 'description' => 'The direct, explicitly declared super types of this node type'],
