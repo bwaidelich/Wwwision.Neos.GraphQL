@@ -39,7 +39,7 @@ class DateTime extends ScalarType
         if (!$value instanceof \DateTimeInterface) {
             return null;
         }
-        return $value->format(DATE_ISO8601);
+        return $value->format(DATE_ATOM);
     }
 
     /**
@@ -51,7 +51,7 @@ class DateTime extends ScalarType
         if (!is_string($value)) {
             return null;
         }
-        $dateTime = \DateTimeImmutable::createFromFormat(DATE_ISO8601, $value);
+        $dateTime = \DateTimeImmutable::createFromFormat(DATE_ATOM, $value);
         if ($dateTime === false) {
             return null;
         }
