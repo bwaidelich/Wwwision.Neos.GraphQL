@@ -17,7 +17,7 @@ class Context extends InputObjectType
      */
     public function __construct(TypeResolver $typeResolver)
     {
-        return parent::__construct([
+        parent::__construct([
             'name' => 'ContextInput',
             'description' => 'Input type for the Content Repository Context',
             'fields' => [

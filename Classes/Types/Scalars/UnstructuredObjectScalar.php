@@ -2,9 +2,8 @@
 namespace Wwwision\Neos\GraphQL\Types\Scalars;
 
 use GraphQL\Language\AST\Node as AstNode;
-use GraphQL\Language\AST\StringValue;
+use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
-use Neos\Flow\Annotations as Flow;
 use Wwwision\GraphQL\IterableAccessibleObject;
 
 /**
@@ -62,11 +61,12 @@ class UnstructuredObjectScalar extends ScalarType
 
     /**
      * @param AstNode $valueAST
+     * @param array $variables
      * @return array
      */
-    public function parseLiteral($valueAST)
+    public function parseLiteral($valueAST, ?array $variables = null)
     {
-        if (!$valueAST instanceof StringValue) {
+        if (!$valueAST instanceof StringValueNode) {
             return null;
         }
         return $this->parseValue($valueAST->value);

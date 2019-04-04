@@ -2,16 +2,12 @@
 namespace Wwwision\Neos\GraphQL\Types\InputTypes;
 
 use GraphQL\Language\AST\Node as AstNode;
-use GraphQL\Language\AST\StringValue;
+use GraphQL\Language\AST\StringValueNode;
 use GraphQL\Type\Definition\ScalarType;
-use Neos\Flow\Annotations as Flow;
-use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Model\NodeType as CRNodeType;
-use Neos\ContentRepository\Domain\Service\Context as CRContext;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\ContentRepository\Exception\NodeTypeNotFoundException;
-use Wwwision\Neos\GraphQL\Types\Scalars\AbsoluteNodePath;
-use Wwwision\Neos\GraphQL\Types\Scalars\Uuid;
+use Neos\Flow\Annotations as Flow;
 
 /**
  * A node represented by its identifier (UUID) or absolute path
@@ -74,11 +70,12 @@ class NodeType extends ScalarType
 
     /**
      * @param AstNode $valueAST
+     * @param array $variables
      * @return string
      */
-    public function parseLiteral($valueAST)
+    public function parseLiteral($valueAST, ?array $variables = null)
     {
-        if (!$valueAST instanceof StringValue) {
+        if (!$valueAST instanceof StringValueNode) {
             return null;
         }
         return $this->parseValue($valueAST->value);

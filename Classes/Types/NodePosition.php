@@ -12,7 +12,7 @@ class NodePosition extends EnumType
 
     public function __construct()
     {
-        return parent::__construct([
+        parent::__construct([
             'name' => 'NodePosition',
             'values' => [
                 'BEFORE' => ['value' => 'before'],

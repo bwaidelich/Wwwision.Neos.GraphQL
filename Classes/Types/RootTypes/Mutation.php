@@ -45,7 +45,7 @@ class Mutation extends ObjectType
     public function __construct(TypeResolver $typeResolver)
     {
         /** @noinspection PhpUnusedParameterInspection */
-        return parent::__construct([
+        parent::__construct([
             'name' => 'Mutations',
             'description' => 'Mutations for the Neos Content Repository',
             'fields' => [

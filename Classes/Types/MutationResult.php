@@ -20,7 +20,7 @@ class MutationResult extends ObjectType
 
     public function __construct()
     {
-        return parent::__construct([
+        parent::__construct([
             'name' => 'MutationResult',
             'description' => 'The result of a mutation',
             'fields' => [

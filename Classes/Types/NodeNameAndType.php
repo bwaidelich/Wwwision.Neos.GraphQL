@@ -15,7 +15,7 @@ class NodeNameAndType extends ObjectType
      */
     public function __construct(TypeResolver $typeResolver)
     {
-        return parent::__construct([
+        parent::__construct([
             'name' => 'NodeNameAndType',
             'description' => 'A wrapper type for node name and node type, used by nodeType.autoCreatedChildNodes for example',
             'fields' => [

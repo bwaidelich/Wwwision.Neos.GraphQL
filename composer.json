@@ -5,7 +5,7 @@
     "license": "GPL-3.0+",
     "require": {
         "neos/neos": "^3.1",
-        "wwwision/graphql": "^2.1"
+        "wwwision/graphql": "^3.1"
     },
     "autoload": {
         "psr-4": {

@@ -27,7 +27,7 @@ class Context extends ObjectType
      */
     public function __construct(TypeResolver $typeResolver)
     {
-        return parent::__construct([
+        parent::__construct([
             'name' => 'Context',
             'description' => 'The context, including information about the current workspace, date and dimensions',
             'fields' => [
