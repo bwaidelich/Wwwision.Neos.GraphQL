@@ -116,6 +116,37 @@ class Mutation extends ObjectType
                         return ['success' => true];
                     },
                 ],
+                'updateNode' => [
+                    'type' => $typeResolver->get(MutationResult::class),
+                    'description' => 'Update the given node in the given context',
+                    'args' => [
+                        'context' => ['type' => Type::nonNull($typeResolver->get(InputTypes\Context::class)), 'description' => 'The CR context of this mutation'],
+                        'node' => ['type' => Type::nonNull($typeResolver->get(InputTypes\NodeIdentifierOrPath::class)), 'description' => 'The node to be updated'],
+                        'nodeType' => ['type' => $typeResolver->get(InputTypes\NodeType::class), 'description' => 'Optionally update the node type'],
+                        'properties' => ['type' => $typeResolver->get(Scalars\UnstructuredObjectScalar::class), 'description' => 'Optionally update the node properties'],
+                        'name' => ['type' => Type::string(), 'description' => 'Optionally update the node name (if not unique this will be tampered)']
+                    ],
+                    'resolve' => function ($_, $args) {
+                        $context = $this->contextFactory->create($args['context']);
+                        $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
+
+                        if (isset($args['name'])) {
+                            $nodeName = $this->nodeService->generateUniqueNodeName($node->getParentPath(), $args['name']);
+                            $node->setName($nodeName);
+                        }
+
+                        if (isset($args['nodeType'])) {
+                            $node->setNodeType($args['nodeType']);
+                        }
+
+                        if (isset($args['properties'])) {
+                            foreach ($args['properties'] as $propertyName => $propertyValue) {
+                                $node->setProperty($propertyName, $propertyValue);
+                            }
+                        }
+                        return ['success' => true];
+                    },
+                ],
                 'moveNode' => [
                     'type' => $typeResolver->get(MutationResult::class),
                     'description' => 'Move a node in the tree in the given context',

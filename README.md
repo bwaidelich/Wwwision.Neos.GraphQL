@@ -16,6 +16,8 @@ Within an existing Neos instance install the package using [composer](https://ge
 composer require wwwision/neos-graphql
 ```
 
+*Note: Since there is no final release yet, you might need to add `"minimum-stability": "dev"` to your root composer manifest!*
+
 Test whether the GraphiQL IDE works by navigating to `/neos/graphql`.
 You should be redirected to the Neos Login form and then back to the GraphiQL interface.
 
