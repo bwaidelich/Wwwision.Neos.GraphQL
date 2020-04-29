@@ -1,13 +1,8 @@
 <?php
 namespace Wwwision\Neos\GraphQL\Types\Scalars;
 
-use GraphQL\Language\AST\Node as AstNode;
-use GraphQL\Language\AST\StringValue;
-use GraphQL\Type\Definition\ScalarType;
-use Neos\Flow\Annotations as Flow;
 use Neos\Media\Domain\Model\ResourceBasedInterface;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Wwwision\GraphQL\IterableAccessibleObject;
 
 /**
  * Type scalar for unknown structures (represented as JSON object)
@@ -31,11 +26,11 @@ class NodePropertiesScalar extends UnstructuredObjectScalar
     public function serialize($value)
     {
         $value = parent::serialize($value);
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return $value;
         }
-        array_walk_recursive($value, function(&$item) {
-            if (!is_object($item)) {
+        array_walk_recursive($value, static function(&$item) {
+            if (!\is_object($item)) {
                 return;
             }
             if ($item instanceof \DateTimeInterface) {

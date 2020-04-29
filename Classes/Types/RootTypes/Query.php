@@ -53,7 +53,6 @@ class Query extends ObjectType
      */
     public function __construct(TypeResolver $typeResolver)
     {
-        /** @noinspection PhpUnusedParameterInspection */
         parent::__construct([
             'name' => 'Query',
             'description' => 'Root queries for the Neos Content Repository',
@@ -85,7 +84,9 @@ class Query extends ObjectType
                             $defaultContext = $this->contextFactory->create();
                             if (isset($args['identifier'])) {
                                 return new AccessibleObject($defaultContext->getNodeByIdentifier($args['identifier']));
-                            } elseif (isset($args['path'])) {
+                            }
+
+                            if (isset($args['path'])) {
                                 return new AccessibleObject($defaultContext->getNode($args['path']));
                             }
                             throw new \InvalidArgumentException('node path or identifier have to be specified!', 1460064707);
@@ -151,7 +152,7 @@ class Query extends ObjectType
                             'includeAbstractNodeTypes' => ['type' => Type::boolean(), 'description' => 'Whether to include abstract node types, defaults to TRUE'],
                         ],
                         'resolve' => function ($_, array $args) {
-                            $includeAbstractNodeTypes = isset($args['includeAbstractNodeTypes']) ? $args['includeAbstractNodeTypes'] : true;
+                            $includeAbstractNodeTypes = $args['includeAbstractNodeTypes'] ?? true;
                             return new IterableAccessibleObject($this->nodeTypeManager->getNodeTypes($includeAbstractNodeTypes));
                         }
                     ],

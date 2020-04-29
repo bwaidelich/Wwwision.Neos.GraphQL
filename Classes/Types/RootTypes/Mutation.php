@@ -44,7 +44,6 @@ class Mutation extends ObjectType
      */
     public function __construct(TypeResolver $typeResolver)
     {
-        /** @noinspection PhpUnusedParameterInspection */
         parent::__construct([
             'name' => 'Mutations',
             'description' => 'Mutations for the Neos Content Repository',
@@ -97,10 +96,10 @@ class Mutation extends ObjectType
                         $designatedParentNode = $this->getDesignatedParentNode($referenceNode, $args['position']);
 
                         // Note: The following lines are "inspired" from the NodeOperations service from the Neos package. We plan to move this logic into the CR package at some point
-                        $proposedNodeName = isset($args['name']) ? $args['name'] : null;
+                        $proposedNodeName = $args['name'] ?? null;
                         $nodeName = $this->nodeService->generateUniqueNodeName($designatedParentNode->getPath(), $proposedNodeName);
-                        $nodeType = isset($args['nodeType']) ? $args['nodeType'] : null;
-                        $nodeIdentifier = isset($args['identifier']) ? $args['identifier'] : null;
+                        $nodeType = $args['nodeType'] ?? null;
+                        $nodeIdentifier = $args['identifier'] ?? null;
                         $newNode = $designatedParentNode->createNode($nodeName, $nodeType, $nodeIdentifier);
                         if ($args['position'] === 'before') {
                             $newNode->moveBefore($referenceNode);
@@ -203,7 +202,7 @@ class Mutation extends ObjectType
                         $targetNode = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['targetNode']);
 
                         // Note: The following lines are "inspired" from the NodeOperations service from the Neos package. We plan to move this logic into the CR package at some point
-                        $proposedNodeName = isset($args['name']) ? $args['name'] : null;
+                        $proposedNodeName = $args['name'] ?? null;
                         $nodeName = $this->nodeService->generateUniqueNodeName($this->getDesignatedParentNode($targetNode, $args['position'])->getPath(), $proposedNodeName);
 
                         switch ($args['position']) {
@@ -231,11 +230,11 @@ class Mutation extends ObjectType
                     ],
                     'resolve' => function ($_, $args) {
                         $context = $this->contextFactory->create($args['context']);
-                        $node = $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
+                        $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $args['node']);
                         if ($node === null) {
                             throw new \InvalidArgumentException(sprintf('The node "%s" could not be found', $args['node']), 1461086537);
                         }
-                        $this->publishingService->publishNode($node, isset($args['targetWorkspace']) ? $args['targetWorkspace'] : null);
+                        $this->publishingService->publishNode($node, $args['targetWorkspace'] ?? null);
 
                         return ['success' => true];
                     },
@@ -252,10 +251,10 @@ class Mutation extends ObjectType
                         $context = $this->contextFactory->create($args['context']);
                         $nodes = [];
                         foreach ($args['nodes'] as $nodePathOrIdentifier) {
-                            $node = $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $nodePathOrIdentifier);
+                            $node = InputTypes\NodeIdentifierOrPath::getNodeFromContext($context, $nodePathOrIdentifier);
                             $nodes[] = $node;
                         }
-                        $this->publishingService->publishNodes($nodes, isset($args['targetWorkspace']) ? $args['targetWorkspace'] : null);
+                        $this->publishingService->publishNodes($nodes, $args['targetWorkspace'] ?? null);
 
                         return ['success' => true];
                     },
@@ -270,7 +269,7 @@ class Mutation extends ObjectType
                     'resolve' => function ($_, $args) {
                         /** @var CRWorkspace $workspace */
                         $workspace = $args['workspace'];
-                        $targetWorkspace = isset($args['targetWorkspace']) ? $args['targetWorkspace'] : null;
+                        $targetWorkspace = $args['targetWorkspace'] ?? null;
 
                         // Note: We don't use Workspace::publish() because that does not trigger signals to flush caches etc..
 
@@ -335,10 +334,10 @@ class Mutation extends ObjectType
      * @param string $position
      * @return NodeInterface
      */
-    protected function getDesignatedParentNode(NodeInterface $targetNode, $position)
+    protected function getDesignatedParentNode(NodeInterface $targetNode, $position): NodeInterface
     {
         $referenceNode = $targetNode;
-        if (in_array($position, array('before', 'after'))) {
+        if (\in_array($position, array('before', 'after'))) {
             $referenceNode = $targetNode->getParent();
         }
 

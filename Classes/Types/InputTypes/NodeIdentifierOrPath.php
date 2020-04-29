@@ -68,7 +68,7 @@ class NodeIdentifierOrPath extends ScalarType
      * @param string $value
      * @return boolean
      */
-    static protected function isValid($value)
+    protected static function isValid($value): bool
     {
         return Uuid::isValid($value) || AbsoluteNodePath::isValid($value);
     }
@@ -78,7 +78,7 @@ class NodeIdentifierOrPath extends ScalarType
      * @param string $nodePathOrIdentifier
      * @return NodeInterface
      */
-    static public function getNodeFromContext(CRContext $context, $nodePathOrIdentifier)
+    public static function getNodeFromContext(CRContext $context, $nodePathOrIdentifier): NodeInterface
     {
         $node = Uuid::isValid($nodePathOrIdentifier) ? $context->getNodeByIdentifier($nodePathOrIdentifier) : $context->getNode($nodePathOrIdentifier);
         if ($node === null) {

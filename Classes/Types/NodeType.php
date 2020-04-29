@@ -36,7 +36,7 @@ class NodeType extends ObjectType
                         'type' => Type::boolean(),
                         'deprecationReason' => 'Not part of the public API',
                         'description' => 'Whether or not this node type is marked abstract',
-                        'resolve' => function (AccessibleObject $wrappedNodeType) {
+                        'resolve' => static function (AccessibleObject $wrappedNodeType) {
                             return $wrappedNodeType->getObject()->isAbstract();
                         }
                     ],
@@ -44,7 +44,7 @@ class NodeType extends ObjectType
                         'type' => Type::boolean(),
                         'deprecationReason' => 'Not part of the public API',
                         'description' => 'Whether or not this node type is marked final',
-                        'resolve' => function (AccessibleObject $wrappedNodeType) {
+                        'resolve' => static function (AccessibleObject $wrappedNodeType) {
                             return $wrappedNodeType->getObject()->isFinal();
                         }
                     ],
@@ -52,7 +52,7 @@ class NodeType extends ObjectType
                     'isAggregate' => [
                         'type' => Type::boolean(),
                         'description' => 'Whether or not this node type is an aggregate. The most prominent aggregate is a Document',
-                        'resolve' => function (AccessibleObject $wrappedNodeType) {
+                        'resolve' => static function (AccessibleObject $wrappedNodeType) {
                             return $wrappedNodeType->getObject()->isAggregate();
                         }
                     ],
@@ -62,7 +62,7 @@ class NodeType extends ObjectType
                         'args' => [
                             'nodeType' => ['type' => Type::nonNull(Type::string())],
                         ],
-                        'resolve' => function (AccessibleObject $wrappedNodeType, array $args) {
+                        'resolve' => static function (AccessibleObject $wrappedNodeType, array $args) {
                             /** @var CRNodeType $nodeType */
                             $nodeType = $wrappedNodeType->getObject();
                             return $nodeType->isOfType($args['nodeType']);
@@ -74,7 +74,7 @@ class NodeType extends ObjectType
                         'args' => [
                             'configurationPath' => ['type' => Type::nonNull(Type::string())],
                         ],
-                        'resolve' => function (AccessibleObject $wrappedNodeType, array $args) {
+                        'resolve' => static function (AccessibleObject $wrappedNodeType, array $args) {
                             /** @var CRNodeType $nodeType */
                             $nodeType = $wrappedNodeType->getObject();
                             return $nodeType->hasConfiguration($args['configurationPath']);
@@ -86,7 +86,7 @@ class NodeType extends ObjectType
                         'args' => [
                             'configurationPath' => ['type' => Type::nonNull(Type::string())],
                         ],
-                        'resolve' => function (AccessibleObject $wrappedNodeType, array $args) {
+                        'resolve' => static function (AccessibleObject $wrappedNodeType, array $args) {
                             /** @var CRNodeType $nodeType */
                             $nodeType = $wrappedNodeType->getObject();
                             return $nodeType->getConfiguration($args['configurationPath']);
@@ -107,7 +107,7 @@ class NodeType extends ObjectType
                         'args' => [
                             'propertyName' => ['type' => Type::nonNull(Type::string())],
                         ],
-                        'resolve' => function (AccessibleObject $wrappedNodeType, array $args) {
+                        'resolve' => static function (AccessibleObject $wrappedNodeType, array $args) {
                             /** @var CRNodeType $nodeType */
                             $nodeType = $wrappedNodeType->getObject();
                             return $nodeType->getPropertyType($args['propertyName']);
@@ -117,7 +117,7 @@ class NodeType extends ObjectType
                     'autoCreatedChildNodes' => [
                         'type' => Type::listOf($typeResolver->get(NodeNameAndType::class)),
                         'description' => 'A list of child nodes which should be automatically created',
-                        'resolve' => function (AccessibleObject $wrappedNodeType) {
+                        'resolve' => static function (AccessibleObject $wrappedNodeType) {
                             /** @var CRNodeType $nodeType */
                             $nodeType = $wrappedNodeType->getObject();
                             $result = [];
@@ -136,7 +136,7 @@ class NodeType extends ObjectType
                         'resolve' => function (AccessibleObject $wrappedNodeType, array $args) {
                             /** @var CRNodeType $nodeType */
                             $nodeType = $wrappedNodeType->getObject();
-                            $includeAbstractNodeTypes = isset($args['includeAbstractNodeTypes']) ? $args['includeAbstractNodeTypes'] : true;
+                            $includeAbstractNodeTypes = $args['includeAbstractNodeTypes'] ?? true;
                             return new IterableAccessibleObject($this->nodeTypeManager->getSubNodeTypes($nodeType->getName(), $includeAbstractNodeTypes));
                         }
                     ],

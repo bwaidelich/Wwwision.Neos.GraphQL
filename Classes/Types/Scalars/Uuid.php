@@ -13,7 +13,7 @@ class Uuid extends ScalarType
     /**
      * @var string
      */
-    const PATTERN_MATCH_UUID = '/^([a-f0-9]){8}-([a-f0-9]){4}-([a-f0-9]){4}-([a-f0-9]){4}-([a-f0-9]){12}$/';
+    private const PATTERN_MATCH_UUID = '/^([a-f0-9]){8}-([a-f0-9]){4}-([a-f0-9]){4}-([a-f0-9]){4}-([a-f0-9]){12}$/';
 
     /**
      * @var string
@@ -68,9 +68,9 @@ class Uuid extends ScalarType
      * @param string $value
      * @return boolean
      */
-    static public function isValid($value)
+    public static function isValid($value)
     {
-        return (is_string($value) && preg_match(self::PATTERN_MATCH_UUID, $value) === 1);
+        return (\is_string($value) && preg_match(self::PATTERN_MATCH_UUID, $value) === 1);
     }
 
 }

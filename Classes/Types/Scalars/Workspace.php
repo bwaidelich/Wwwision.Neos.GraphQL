@@ -56,7 +56,7 @@ class Workspace extends ScalarType
      */
     public function parseValue($value)
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             return null;
         }
         /** @noinspection PhpUndefinedMethodInspection */

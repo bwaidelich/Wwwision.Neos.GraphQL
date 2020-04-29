@@ -64,7 +64,7 @@ class AbsoluteNodePath extends ScalarType
      * @param string $value
      * @return string
      */
-    private function coerceNodePath($value)
+    private function coerceNodePath($value): string
     {
         if (!self::isValid($value)) {
             return null;
@@ -76,8 +76,8 @@ class AbsoluteNodePath extends ScalarType
      * @param string $value
      * @return bool
      */
-    static public function isValid($value)
+    public static function isValid($value): bool
     {
-        return (is_string($value) && substr($value, 0, 1) === '/');
+        return (\is_string($value) && $value[0] === '/');
     }
 }

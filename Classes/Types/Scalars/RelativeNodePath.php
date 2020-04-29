@@ -66,7 +66,7 @@ class RelativeNodePath extends ScalarType
      */
     private function coerceNodePath($value)
     {
-        if (!is_string($value) || substr($value, 0, 1) === '/') {
+        if (!\is_string($value) || $value[0] === '/') {
             return null;
         }
         return $value;

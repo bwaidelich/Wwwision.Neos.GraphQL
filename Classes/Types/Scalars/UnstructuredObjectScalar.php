@@ -38,7 +38,7 @@ class UnstructuredObjectScalar extends ScalarType
         if ($value instanceof IterableAccessibleObject) {
             return iterator_to_array($value->getIterator());
         }
-        if (!is_array($value)) {
+        if (!\is_array($value)) {
             return null;
         }
         return $value;
@@ -50,10 +50,10 @@ class UnstructuredObjectScalar extends ScalarType
      */
     public function parseValue($value)
     {
-        if (is_string($value)) {
+        if (\is_string($value)) {
             $value = json_decode($value, true);
         }
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $value;
         }
         return null;

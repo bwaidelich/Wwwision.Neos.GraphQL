@@ -42,7 +42,7 @@ class Node extends ObjectType
                         'args' => [
                             'propertyName' => ['type' => Type::nonNull(Type::string())],
                         ],
-                        'resolve' => function (AccessibleObject $wrappedNode, array $args) {
+                        'resolve' => static function (AccessibleObject $wrappedNode, array $args) {
                             /** @var NodeInterface $node */
                             $node = $wrappedNode->getObject();
                             return $node->hasProperty($args['propertyName']);
@@ -77,12 +77,12 @@ class Node extends ObjectType
                             'limit' => ['type' => Type::int()],
                             'offset' => ['type' => Type::int()],
                         ],
-                        'resolve' => function (AccessibleObject $wrappedNode, array $args) {
+                        'resolve' => static function (AccessibleObject $wrappedNode, array $args) {
                             /** @var NodeInterface $node */
                             $node = $wrappedNode->getObject();
-                            $nodeTypeFilter = isset($args['nodeTypeFilter']) ? $args['nodeTypeFilter'] : null;
-                            $limit = isset($args['limit']) ? $args['limit'] : null;
-                            $offset = isset($args['offset']) ? $args['offset'] : null;
+                            $nodeTypeFilter = $args['nodeTypeFilter'] ?? null;
+                            $limit = $args['limit'] ?? null;
+                            $offset = $args['offset'] ?? null;
                             return new IterableAccessibleObject($node->getChildNodes($nodeTypeFilter, $limit, $offset));
                         }
                     ],
@@ -106,7 +106,7 @@ class Node extends ObjectType
                         'args' => [
                             'path' => ['type' => Type::nonNull($typeResolver->get(Scalars\RelativeNodePath::class))],
                         ],
-                        'resolve' => function (AccessibleObject $wrappedNode, array $args) {
+                        'resolve' => static function (AccessibleObject $wrappedNode, array $args) {
                             /** @var NodeInterface $node */
                             $node = $wrappedNode->getObject();
                             return new AccessibleObject($node->getNode($args['path']));
@@ -118,10 +118,10 @@ class Node extends ObjectType
                         'args' => [
                             'nodeTypeFilter' => ['type' => Type::string()],
                         ],
-                        'resolve' => function (AccessibleObject $wrappedNode, array $args) {
+                        'resolve' => static function (AccessibleObject $wrappedNode, array $args) {
                             /** @var NodeInterface $node */
                             $node = $wrappedNode->getObject();
-                            return $node->hasChildNodes(isset($args['nodeTypeFilter']) ? $args['nodeTypeFilter'] : null);
+                            return $node->hasChildNodes($args['nodeTypeFilter'] ?? null);
                         }
                     ],
                     'nodeType' => ['type' => $typeResolver->get(NodeType::class), 'description' => 'The node type of this node'],
@@ -131,7 +131,7 @@ class Node extends ObjectType
                         'type' => Type::listOf($typeResolver->get(Node::class)),
                         'deprecationReason' => 'Not part of the public API',
                         'description' => 'Other variants of this very node (with different dimension values)',
-                        'resolve' => function (AccessibleObject $wrappedNode) {
+                        'resolve' => static function (AccessibleObject $wrappedNode) {
                             /** @var NodeInterface $node */
                             $node = $wrappedNode->getObject();
                             return new IterableAccessibleObject($node->getOtherNodeVariants());

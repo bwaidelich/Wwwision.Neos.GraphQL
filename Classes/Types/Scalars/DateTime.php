@@ -47,7 +47,7 @@ class DateTime extends ScalarType
      */
     public function parseValue($value)
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             return null;
         }
         $dateTime = \DateTimeImmutable::createFromFormat(DATE_ATOM, $value);

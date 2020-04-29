@@ -57,7 +57,7 @@ class NodeType extends ScalarType
      */
     public function parseValue($value)
     {
-        if (!is_string($value)) {
+        if (!\is_string($value)) {
             return null;
         }
         try {
