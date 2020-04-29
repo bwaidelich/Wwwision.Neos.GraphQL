@@ -69,23 +69,23 @@ class Node extends ObjectType
                     'parent' => ['type' => $typeResolver->get(Node::class), 'description' => 'The parent node of this node'],
                     'parentPath' => ['type' => $typeResolver->get(AbsoluteNodePath::class), 'description' => 'The parent node path'],
                     'primaryChildNode' => ['type' => $typeResolver->get(Node::class), 'description' => 'The primary child node of this node, if it exists'],
-//                    'childNodes' => [
-//                        'type' => Type::listOf($typeResolver->get(Node::class)),
-//                        'description' => 'All direct child nodes of this node, optionally filtered by type',
-//                        'args' => [
-//                            'nodeTypeFilter' => ['type' => Type::string()],
-//                            'limit' => ['type' => Type::int()],
-//                            'offset' => ['type' => Type::int()],
-//                        ],
-//                        'resolve' => function (AccessibleObject $wrappedNode, array $args) {
-//                            /** @var NodeInterface $node */
-//                            $node = $wrappedNode->getObject();
-//                            $nodeTypeFilter = isset($args['nodeTypeFilter']) ? $args['nodeTypeFilter'] : null;
-//                            $limit = isset($args['limit']) ? $args['limit'] : null;
-//                            $offset = isset($args['offset']) ? $args['offset'] : null;
-//                            return new IterableAccessibleObject($node->getChildNodes($nodeTypeFilter, $limit, $offset));
-//                        }
-//                    ],
+                    'childNodes' => [
+                        'type' => Type::listOf($typeResolver->get(Node::class)),
+                        'description' => 'All direct child nodes of this node, optionally filtered by type',
+                        'args' => [
+                            'nodeTypeFilter' => ['type' => Type::string()],
+                            'limit' => ['type' => Type::int()],
+                            'offset' => ['type' => Type::int()],
+                        ],
+                        'resolve' => function (AccessibleObject $wrappedNode, array $args) {
+                            /** @var NodeInterface $node */
+                            $node = $wrappedNode->getObject();
+                            $nodeTypeFilter = isset($args['nodeTypeFilter']) ? $args['nodeTypeFilter'] : null;
+                            $limit = isset($args['limit']) ? $args['limit'] : null;
+                            $offset = isset($args['offset']) ? $args['offset'] : null;
+                            return new IterableAccessibleObject($node->getChildNodes($nodeTypeFilter, $limit, $offset));
+                        }
+                    ],
                     'isNodeAllowedAsChildNode' => [
                         'type' => Type::boolean(),
                         'deprecationReason' => 'Not part of the public API',
@@ -127,16 +127,16 @@ class Node extends ObjectType
                     'nodeType' => ['type' => $typeResolver->get(NodeType::class), 'description' => 'The node type of this node'],
                     'dimensions' => ['type' => $typeResolver->get(Scalars\UnstructuredObjectScalar::class), 'deprecationReason' => 'Not part of the public API', 'description' => 'The content dimensions assigned to this node'],
                     'context' => ['type' => $typeResolver->get(Context::class), 'deprecationReason' => 'Not part of the public API', 'description' => 'The context of this node'],
-//                    'otherNodeVariants' => [
-//                        'type' => Type::listOf($typeResolver->get(Node::class)),
-//                        'deprecationReason' => 'Not part of the public API',
-//                        'description' => 'Other variants of this very node (with different dimension values)',
-//                        'resolve' => function (AccessibleObject $wrappedNode) {
-//                            /** @var NodeInterface $node */
-//                            $node = $wrappedNode->getObject();
-//                            return new IterableAccessibleObject($node->getOtherNodeVariants());
-//                        }
-//                    ],
+                    'otherNodeVariants' => [
+                        'type' => Type::listOf($typeResolver->get(Node::class)),
+                        'deprecationReason' => 'Not part of the public API',
+                        'description' => 'Other variants of this very node (with different dimension values)',
+                        'resolve' => function (AccessibleObject $wrappedNode) {
+                            /** @var NodeInterface $node */
+                            $node = $wrappedNode->getObject();
+                            return new IterableAccessibleObject($node->getOtherNodeVariants());
+                        }
+                    ],
                 ];
             }
         ]);

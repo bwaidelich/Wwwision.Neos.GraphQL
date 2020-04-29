@@ -127,19 +127,19 @@ class NodeType extends ObjectType
                             return $result;
                         }
                     ],
-//                'subNodeTypes' => [
-//                    'type' => Type::listOf($typeResolver->get(NodeType::class)),
-//                    'description' => 'All sub types of this node type',
-//                    'args' => [
-//                        'includeAbstractNodeTypes' => ['type' => Type::boolean(), 'description' => 'Whether to include abstract node types, defaults to TRUE'],
-//                    ],
-//                    'resolve' => function (AccessibleObject $wrappedNodeType, array $args) {
-//                        /** @var CRNodeType $nodeType */
-//                        $nodeType = $wrappedNodeType->getObject();
-//                        $includeAbstractNodeTypes = isset($args['includeAbstractNodeTypes']) ? $args['includeAbstractNodeTypes'] : true;
-//                        return new IterableAccessibleObject($this->nodeTypeManager->getSubNodeTypes($nodeType->getName(), $includeAbstractNodeTypes));
-//                    }
-//                ],
+                    'subNodeTypes' => [
+                        'type' => Type::listOf($typeResolver->get(NodeType::class)),
+                        'description' => 'All sub types of this node type',
+                        'args' => [
+                            'includeAbstractNodeTypes' => ['type' => Type::boolean(), 'description' => 'Whether to include abstract node types, defaults to TRUE'],
+                        ],
+                        'resolve' => function (AccessibleObject $wrappedNodeType, array $args) {
+                            /** @var CRNodeType $nodeType */
+                            $nodeType = $wrappedNodeType->getObject();
+                            $includeAbstractNodeTypes = isset($args['includeAbstractNodeTypes']) ? $args['includeAbstractNodeTypes'] : true;
+                            return new IterableAccessibleObject($this->nodeTypeManager->getSubNodeTypes($nodeType->getName(), $includeAbstractNodeTypes));
+                        }
+                    ],
                 ];
             }
         ]);

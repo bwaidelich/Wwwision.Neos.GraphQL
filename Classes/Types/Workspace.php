@@ -7,6 +7,7 @@ use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\Workspace as CRWorkspace;
 use Neos\ContentRepository\Domain\Service\PublishingServiceInterface;
 use Wwwision\GraphQL\AccessibleObject;
+use Wwwision\GraphQL\IterableAccessibleObject;
 use Wwwision\GraphQL\TypeResolver;
 
 /**
@@ -39,16 +40,16 @@ class Workspace extends ObjectType
                     'isInternalWorkspace' => ['type' => Type::boolean(), 'description' => 'Whether this workspace is shared across all editors'],
                     'isPublicWorkspace' => ['type' => Type::boolean(), 'description' => 'Whether this workspace is public to everyone, even without authentication'],
                     'baseWorkspace' => ['type' => $typeResolver->get(Workspace::class), 'description' => 'The base workspace, if any'],
-                    #'baseWorkspaces' => ['type' => Type::listOf($typeResolver->get(Workspace::class)), 'description' => 'All base workspaces, if any'],
+                    'baseWorkspaces' => ['type' => Type::listOf($typeResolver->get(Workspace::class)), 'description' => 'All base workspaces, if any'],
                     'nodeCount' => ['type' => Type::int(), 'description' => 'The number of nodes in this workspace'],
-//                'unpublishedNodes' => [
-//                    'type' => Type::listOf($typeResolver->get(Node::class)),
-//                    'resolve' => function (AccessibleObject $wrappedWorkspace) {
-//                        /** @var CRWorkspace $workspace */
-//                        $workspace = $wrappedWorkspace->getObject();
-//                        return new IterableAccessibleObject($this->publishingService->getUnpublishedNodes($workspace));
-//                    }
-//                ],
+                    'unpublishedNodes' => [
+                        'type' => Type::listOf($typeResolver->get(Node::class)),
+                        'resolve' => function (AccessibleObject $wrappedWorkspace) {
+                            /** @var CRWorkspace $workspace */
+                            $workspace = $wrappedWorkspace->getObject();
+                            return new IterableAccessibleObject($this->publishingService->getUnpublishedNodes($workspace));
+                        }
+                    ],
                     'unpublishedNodesCount' => [
                         'type' => Type::int(),
                         'resolve' => function (AccessibleObject $wrappedWorkspace) {
