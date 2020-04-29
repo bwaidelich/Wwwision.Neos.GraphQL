@@ -16,15 +16,13 @@ Within an existing Neos instance install the package using [composer](https://ge
 composer require wwwision/neos-graphql
 ```
 
-*Note: Since there is no final release yet, you might need to add `"minimum-stability": "dev"` to your root composer manifest!*
-
-Test whether the GraphiQL IDE works by navigating to `/neos/graphql`.
+Test whether the GraphQL Playground works by navigating to `/neos/graphql`.
 You should be redirected to the Neos Login form and then back to the GraphiQL interface.
 
 ## Usage
 
 All the types, queries and mutations are documented and in sync with the PHP API, so this should be pretty self-explanatory
-if you're familiar with [GraphQL](http://graphql.org/) and/or with the [GraphiQL IDE](https://github.com/graphql/graphiql).
+if you're familiar with [GraphQL](http://graphql.org/) and/or with the [GraphQL Playground](https://github.com/prisma-labs/graphql-playground).
 
 Here are some random snapshots of the package in action:
 
