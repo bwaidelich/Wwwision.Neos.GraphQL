@@ -4,8 +4,8 @@
     "name": "wwwision/neos-graphql",
     "license": "GPL-3.0+",
     "require": {
-        "neos/neos": "^4.2 || ^5.0 || ^5.1",
-        "wwwision/graphql": "^3.1"
+        "neos/neos": "^4.2 || ^5.0 || ^5.1 || ^7.0",
+        "wwwision/graphql": "^4.0"
     },
     "autoload": {
         "psr-4": {
